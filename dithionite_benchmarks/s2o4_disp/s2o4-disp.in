@@ -1,0 +1,173 @@
+# Id: s2o4_disp.in, Mon 24 Apr 2017 01:09:25 PM MDT pandeys #
+# Created by Sachin Pandey, LANL
+# Description: Test disproportionation of dithionite in the presence of sediments
+#------------------------------------------------------------------------------
+
+SIMULATION
+  SIMULATION_TYPE SUBSURFACE
+  PROCESS_MODELS
+    SUBSURFACE_FLOW flow
+      MODE RICHARDS
+    /
+    SUBSURFACE_TRANSPORT transport
+      GLOBAL_IMPLICIT
+      NUMERICAL_JACOBIAN
+    /
+  /
+END
+
+SUBSURFACE
+
+#=========================== chemistry ========================================
+CHEMISTRY
+  PRIMARY_SPECIES
+    H+
+    S2O4--
+    SO3--
+    S2O3--
+    HCO3-
+  /
+  SECONDARY_SPECIES
+    OH-
+    CO3--
+    CO2(aq)
+  /
+  REACTION_SANDBOX
+    S2O4_DISP
+      RATE_CONSTANT 3.61d-5 # /s, Istok (1999), 0.13 /hr
+      EPS 1.d-100
+    /
+  /
+  DATABASE ../chromium_dithionite_2017.dat
+  ACTIVITY_COEFFICIENTS TIMESTEP
+  LOG_FORMULATION
+  OUTPUT
+    ALL
+    FREE_ION
+    TOTAL
+    SECONDARY_SPECIES
+    PH
+  /
+END
+
+#=========================== solver options ===================================
+LINEAR_SOLVER FLOW
+  SOLVER DIRECT
+END
+
+LINEAR_SOLVER TRANSPORT
+  SOLVER DIRECT
+END
+
+#=========================== discretization ===================================
+GRID
+  TYPE structured
+  ORIGIN 0.d0 0.d0 0.d0
+  NXYZ 1 1 1
+  BOUNDS
+    0.d0 0.d0 0.d0
+    1.d0 1.d0 1.d0
+  /
+END
+
+#=========================== fluid properties =================================
+FLUID_PROPERTY
+  DIFFUSION_COEFFICIENT 1.d-9
+END
+
+#=========================== material properties ==============================
+MATERIAL_PROPERTY saprolite
+  ID 1
+  POROSITY 3.28d-1
+  TORTUOSITY 1.d0
+  PERMEABILITY
+    PERM_ISO 1.d-12
+  /
+  CHARACTERISTIC_CURVES sf_saprolite
+END
+
+#=========================== saturation functions =============================
+! note: no need to specify phase as Richards is soley water phase
+CHARACTERISTIC_CURVES sf_saprolite
+  SATURATION_FUNCTION VAN_GENUCHTEN
+    M 8.5714d-01
+    ALPHA 7.6825e-05
+    LIQUID_RESIDUAL_SATURATION 1.5d-1
+  /
+  PERMEABILITY_FUNCTION MUALEM_VG_LIQ
+    M 8.5714d-01
+    LIQUID_RESIDUAL_SATURATION 1.5d-1
+  /
+END
+
+#=========================== output options ===================================
+OUTPUT
+  PERIODIC TIME 1.d0 d
+  PERIODIC_OBSERVATION TIME 1.d-1 d
+  PRINT_COLUMN_IDS
+END
+
+#=========================== times ============================================
+TIME
+  FINAL_TIME 10.d0 d
+  INITIAL_TIMESTEP_SIZE 1.d-10 d
+  MAXIMUM_TIMESTEP_SIZE 1.d0 d
+END
+
+#=========================== regions ==========================================
+REGION all
+  COORDINATES
+    0.d0 0.d0 0.d0
+    1.d0 1.d0 1.d0
+  /
+END
+
+REGION obs
+  BLOCK 1 1 1 1 1 1
+END
+
+OBSERVATION obs
+  REGION obs
+END
+
+#=========================== flow conditions ==================================
+FLOW_CONDITION initial_pressure
+  TYPE
+    PRESSURE dirichlet  ! type is dirichlet for pressure
+  /                                       !   (constant pressure [Pa])
+    PRESSURE 1.0132e+05   ! saturated
+END
+
+#=========================== transport conditions =============================
+TRANSPORT_CONDITION initial
+  TYPE dirichlet
+  CONSTRAINT_LIST
+    0.d0 initial
+  /
+END
+
+#=========================== constraints ======================================
+CONSTRAINT initial
+  CONCENTRATIONS
+    H+     11.d0 P
+    S2O4--  1.d-1 T
+    SO3--   1.d-20 T
+    S2O3--  1.d-20 T
+    HCO3-   1.d0 T
+  /
+END
+
+#=========================== condition couplers ===============================
+INITIAL_CONDITION
+  FLOW_CONDITION initial_pressure
+  TRANSPORT_CONDITION initial
+  REGION all
+END
+
+#=========================== condition couplers ===============================
+STRATA
+  REGION all
+  MATERIAL saprolite
+END
+
+END_SUBSURFACE

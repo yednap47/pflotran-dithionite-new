@@ -5,72 +5,31 @@ import matplotlib.pyplot as plt
 
 liter_b_to_m3_b = 1e3
 
-def make_chrotran_sandbox(pars):
-    def chrotran_sandbox(u, t):
-        C = u[0] # [M]
-        D_m = u[1] # [M]
-        I = u[2] # [M]
-        X = u[3] # [M]
-        B = u[4] # [mol/m3_bulk]
-        D_i = u[5] # [mol/m3_bulk]
-        chubbite_vf = u[6]
+def make_dithionite_sandbox(pars):
+	def dithionite_sandbox(u, t):
+		s2o4 = u[0] # [M]
+		
+		L_water = pars['por'] * pars['s'] * pars['volume'] * 1000.0 # L_water from m^3_water
+		
+		cnv_mobileImmobile = pars['por'] * pars['s'] * 1000.0 # L_h20/m^3_bulk
+		
+		mu_B = pars['lambda_B1'] * B * D/(D + pars['K_D']) * (pars['K_B'] / (pars['K_B'] + B))**pars['alpha'] * pars['K_I']/(pars['K_I'] + I) # [mol/m^3_bulk/s]
 
-        theta0 = pars['por'] * pars['s'] * liter_b_to_m3_b # L_water / m3_bulk
-        #theta0 = max(0.01,(1 -chubbite_vf)) * pars['s'] * liter_b_to_m3_b # L water / m3_bulk
+		mu_CD = pars['gamma_CD'] * C * D # [mol/L_water/s]
 
-        D = D_m + D_i / theta0 # [mol/L water]
+		# MOBILE DERIVATIVES [mol/L_water/s]
+		ds2o4_dt = pars['k_s2o4_disp'] * s2o4 # mole/l-s
 
-        mmf = D_m/D # mobile mole fraction
-        immf = 1-mmf
-
-        mu_B = pars['lambda_B1'] * B * D/(D + pars['K_D']) * (pars['K_B'] / (pars['K_B'] + B))**pars['alpha'] * pars['K_I']/(pars['K_I'] + I) # [mol/m^3_bulk/s]
-
-        mu_CD = pars['gamma_CD'] * C * D # [mol/L_water/s]
-
-        # MOBILE DERIVATIVES [mol/L_water/s]
-        dC_dt = (- pars['lambda_C']*(B/theta0)*C/(pars['K_C']+C)
-                 - pars['S_C']*mu_CD
-                 )
-
-        dDm_dt = (- pars['S_D_1'] * mmf * (mu_B/theta0)
-                  - pars['lambda_D'] * mmf * (B/theta0)
-                  - pars['S_D_2'] * mmf * mu_CD
-                  - pars['lambda_D_i'] * D_m
-                  + pars['lambda_D_m'] * (D_i/theta0)
-                  )
-        
-        dI_dt = 0.0
-        
-        dX_dt = - pars['gamma_X'] * X * (B/theta0)
-        
-        # IMMOBILE DERIVATIVES [mol/m^3_bulk/s]
-        dB_dt = (  mu_B
-                 - pars['lambda_B2'] * (B - pars['B_min'])
-                 - pars['gamma_B'] * (B - pars['B_min']) * X
-                 )
-
-        dDi_dt = (- pars['S_D_1'] * immf * mu_B
-                  - pars['lambda_D'] * immf * B
-                  - pars['S_D_2'] * immf * mu_CD * theta0
-                  + pars['lambda_D_i'] * D_m * theta0
-                  - pars['lambda_D_m'] * D_i
-                  )
-
-        return [dC_dt, dDm_dt, dI_dt, dX_dt, dB_dt, dDi_dt, 0]
-    
-    return chrotran_sandbox
+		return [ds2o4_dt*L_water]
+	
+	return chrotran_sandbox
 
 def run_ode(init, pars, sopt, function):
 	# solver = odespy.RK4(function)
 	solver = odespy.CashKarp(function)
 	solver.set_initial_condition([
-		init['C'], # [M]
-		init['D_m'], # [M]
-		init['I'], # [M]
-		init['X'], # [M]
-		init['B'], # [mol/m3_bulk]
-		init['D_i'], # [mol/m3_bulk]
-		init['chubbite_vf'],
+		init['s2o4'], # [M]
+		# init['chubbite_vf'],
 		])
 
 	time_points = np.linspace(0,sopt['T'],sopt['N']+1)
