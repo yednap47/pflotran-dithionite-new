@@ -346,6 +346,11 @@ chem_obj = \
 	${common_src}reaction_sandbox_pnnl_cyber.o \
 	${common_src}reaction_sandbox_simple.o \
 	${common_src}reaction_sandbox_ufd_wp.o \
+	${common_src}reaction_sandbox_s2o4_fe3.o \
+	${common_src}reaction_sandbox_s2o4_o2.o \
+	${common_src}reaction_sandbox_s2o4_disp.o \
+	${common_src}reaction_sandbox_fe2_o2.o \
+	${common_src}reaction_sandbox_fe2_cr6.o \
 	${common_src}reaction_solid_solution.o \
 	${common_src}reaction_solid_solution_aux.o \
 	${common_src}reaction_surf_complex.o \
@@ -1255,6 +1260,11 @@ reaction_sandbox.o : global_aux.o input_aux.o material_aux.o option.o \
                      reaction_sandbox_base.o reaction_sandbox_clm_cn.o \
                      reaction_sandbox_example.o reaction_sandbox_pnnl_cyber.o \
                      reaction_sandbox_simple.o reaction_sandbox_ufd_wp.o \
+                     reaction_sandbox_s2o4_fe3.o \
+                     reaction_sandbox_s2o4_o2.o \
+                     reaction_sandbox_s2o4_disp.o \
+                     reaction_sandbox_fe2_o2.o \
+                     reaction_sandbox_fe2_cr6.o \
                      reactive_transport_aux.o string.o utility.o
 reaction_sandbox_base.o : global_aux.o input_aux.o material_aux.o option.o \
                           output_aux.o pflotran_constants.o reaction_aux.o \
@@ -1282,6 +1292,26 @@ reaction_sandbox_ufd_wp.o : global_aux.o input_aux.o material_aux.o option.o \
                             pflotran_constants.o reaction_aux.o \
                             reaction_immobile_aux.o reaction_sandbox_base.o \
                             reactive_transport_aux.o string.o units.o
+reaction_sandbox_s2o4_fe3.o : global_aux.o input_aux.o material_aux.o option.o \
+                             pflotran_constants.o reaction_aux.o \
+                             reaction_sandbox_base.o reactive_transport_aux.o \
+                             string.o units.o
+reaction_sandbox_s2o4_o2.o : global_aux.o input_aux.o material_aux.o option.o \
+                             pflotran_constants.o reaction_aux.o \
+                             reaction_sandbox_base.o reactive_transport_aux.o \
+                             string.o units.o
+reaction_sandbox_s2o4_disp.o : global_aux.o input_aux.o material_aux.o option.o \
+                             pflotran_constants.o reaction_aux.o \
+                             reaction_sandbox_base.o reactive_transport_aux.o \
+                             string.o units.o
+reaction_sandbox_fe2_o2.o : global_aux.o input_aux.o material_aux.o option.o \
+                             pflotran_constants.o reaction_aux.o \
+                             reaction_sandbox_base.o reactive_transport_aux.o \
+                             string.o units.o
+reaction_sandbox_fe2_cr6.o : global_aux.o input_aux.o material_aux.o option.o \
+                             pflotran_constants.o reaction_aux.o \
+                             reaction_sandbox_base.o reactive_transport_aux.o \
+                             string.o units.o
 reaction_solid_solution.o : input_aux.o option.o pflotran_constants.o \
                             reaction_aux.o reaction_mineral.o \
                             reaction_mineral_aux.o \
