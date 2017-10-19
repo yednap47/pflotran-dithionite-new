@@ -18,9 +18,12 @@ import pyfun as pf
 pars = {'s'				: 1.0, # saturation
 		'por'			: 0.25, # porosity
 		'v_cell'		: 1.0, # m^3_bulk
+		'rho_rock'		: 1.e3, # kg/m^3_bulk
 
 		'k_s2o4_disp'	: 1.e-5, # [/s]
-		'k_s2o4_o2'		: 0.0 # [/s]
+		'k_s2o4_o2'		: 0.0, # [/s]
+		'k_fe2_o2_fast'	: 0.0, # [/s]
+		'k_fe2_o2_slow'	: 0.0 # [/s]
 }
 
 # Solver options
@@ -29,18 +32,18 @@ sopt = {'T' :	10.0 * 24 * 60 * 60, # end of simulation [s from d]
 }
 
 # Initial conditions
-init = {'H+'		: 1.0e-11, # [M]
-		'O2(aq)'	: 1.e-20,  # [M]
-		'CrO4--'	: 1.e-20,  # [M]
-		'S2O4--'	: 1.e-1,   # [M]
-		'S2O3--'	: 1.e-20,  # [M]
-		'SO3--'		: 1.e-20,  # [M]
-		'SO4--'		: 1.e-20,  # [M]
-		'Fe+++'		: 1.e-20,  # [M]
-		'Fe++'		: 1.e-20,  # [M]
-		'Cr+++'		: 1.e-20,  # [M]
-		'slow_Fe++' : 1.e-20,  # [m^3/m^3_bulk]
-		'fast_Fe++' : 1.e-20   # [m^3/m^3_bulk]
+init = {'H+'		: 1.e-11, # [M]
+		'O2(aq)'	: 1.e-20, # [M]
+		'CrO4--'	: 1.e-20, # [M]
+		'S2O4--'	: 1.e-1, # [M]
+		'S2O3--'	: 1.e-20, # [M]
+		'SO3--'		: 1.e-20, # [M]
+		'SO4--'		: 1.e-20, # [M]
+		'Fe+++'		: 1.e-20, # [M]
+		'Fe++'		: 1.e-20, # [M]
+		'Cr+++'		: 1.e-20, # [M]
+		'fast_Fe++' : 1.e-20, # [m^3/m^3_bulk]
+		'slow_Fe++' : 1.e-20 # [m^3/m^3_bulk]
 }
 
 dithionite_sandbox = pf.make_dithionite_sandbox(pars)
@@ -88,7 +91,7 @@ pflo_plotvars = list(it.product(*pflo_plotvars))
 ode_plotvars = ['S2O4--']
 legend_list = ['S2O4--, PFLOTRAN','S2O4--, odespy']
 # 
-pf.plot_benchmarks(ax, results_ode=results_ode, results_pflotran=results_pflotran, ode_plotvars=ode_plotvars, pflo_plotvars=pflo_plotvars, legend_list=legend_list, xlabel="Time [hr]",ylabel="Concentration [M]", xlims=xlims, skipfactor=skipfactor, fontsize=fontsize)
+pf.plot_benchmarks(ax, results_ode=results_ode, results_pflotran=results_pflotran, ode_plotvars=ode_plotvars, pflo_plotvars=pflo_plotvars, legend_list=legend_list, xlabel="Time [d]",ylabel="Concentration [M]", xlims=xlims, skipfactor=skipfactor, fontsize=fontsize)
 
 # Third plot
 ax = fig.add_subplot(2, 2, 3)
@@ -97,7 +100,7 @@ pflo_plotvars = list(it.product(*pflo_plotvars))
 ode_plotvars = ['S2O3--']
 legend_list = ['S2O3--, PFLOTRAN','S2O3--, odespy']
 # 
-pf.plot_benchmarks(ax, results_ode=results_ode, results_pflotran=results_pflotran, ode_plotvars=ode_plotvars, pflo_plotvars=pflo_plotvars, legend_list=legend_list, xlabel="Time [hr]",ylabel="Concentration [M]", xlims=xlims, skipfactor=skipfactor, fontsize=fontsize)
+pf.plot_benchmarks(ax, results_ode=results_ode, results_pflotran=results_pflotran, ode_plotvars=ode_plotvars, pflo_plotvars=pflo_plotvars, legend_list=legend_list, xlabel="Time [d]",ylabel="Concentration [M]", xlims=xlims, skipfactor=skipfactor, fontsize=fontsize)
 
 # Fourth plot
 ax = fig.add_subplot(2, 2, 4)
@@ -106,7 +109,7 @@ pflo_plotvars = list(it.product(*pflo_plotvars))
 ode_plotvars = ['SO3--']
 legend_list = ['SO3--, PFLOTRAN','SO3--, odespy']
 # 
-pf.plot_benchmarks(ax, results_ode=results_ode, results_pflotran=results_pflotran, ode_plotvars=ode_plotvars, pflo_plotvars=pflo_plotvars, legend_list=legend_list, xlabel="Time [hr]",ylabel="Concentration [M]", xlims=xlims, skipfactor=skipfactor, fontsize=fontsize)
+pf.plot_benchmarks(ax, results_ode=results_ode, results_pflotran=results_pflotran, ode_plotvars=ode_plotvars, pflo_plotvars=pflo_plotvars, legend_list=legend_list, xlabel="Time [d]",ylabel="Concentration [M]", xlims=xlims, skipfactor=skipfactor, fontsize=fontsize)
 
 plt.suptitle("dithionite degradation")
 plt.tight_layout(rect=[0, 0.03, 1, 0.95])

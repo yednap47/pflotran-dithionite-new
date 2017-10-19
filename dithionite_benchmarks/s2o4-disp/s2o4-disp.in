@@ -22,9 +22,19 @@ SUBSURFACE
 CHEMISTRY
   PRIMARY_SPECIES
     H+
+    O2(aq)
+    CrO4--
+    Cr+++
     S2O4--
-    SO3--
     S2O3--
+    SO3--
+    SO4--
+    Fe+++
+    Fe++
+  /
+  IMMOBILE_SPECIES
+    fast_Fe++
+    slow_Fe++
   /
   REACTION_SANDBOX
     S2O4_DISP
@@ -144,9 +154,19 @@ END
 CONSTRAINT initial
   CONCENTRATIONS
     H+      1.d-11 T
+    O2(aq)  1.d-20 T
+    CrO4--  1.d-20 T
+    Cr+++   1.d-20 T
     S2O4--  1.d-1 T
     S2O3--  1.d-20 T
     SO3--   1.d-20 T
+    SO4--   1.d-20 T
+    Fe+++   1.d-20 T
+    Fe++    1.d-20 T
+  /
+  IMMOBILE
+    fast_Fe++ 1.d-20
+    slow_Fe++ 1.d-20
   /
 END
 
