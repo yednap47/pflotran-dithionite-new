@@ -245,7 +245,7 @@ subroutine S2o4_dispReact(this,Residual,Jacobian,compute_derivative, &
   ! Residuals
   Residual(this%id_spec_s2o4) = Residual(this%id_spec_s2o4) - (-1.0*rate) * L_water
   Residual(this%id_spec_so3) = Residual(this%id_spec_so3) - (1.0*rate) * L_water
-  Residual(this%id_spec_s2o3) = Residual(this%id_spec_s2o3) - (1.0*rate) * L_water
+  Residual(this%id_spec_s2o3) = Residual(this%id_spec_s2o3) - (0.5*rate) * L_water
   Residual(this%id_spec_h) = Residual(this%id_spec_h) - (1.0*rate) * L_water
 
   if (compute_derivative) then

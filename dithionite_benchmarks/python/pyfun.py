@@ -7,28 +7,28 @@ liter_b_to_m3_b = 1e3
 
 def make_dithionite_sandbox(pars):
 	def dithionite_sandbox(u, t):
-		s2o4 = u[0] # [M]
-		
-		L_water = pars['por'] * pars['s'] * pars['volume'] * 1000.0 # L_water from m^3_water
-		
+		# Concentrations
+		s2o4 = u[1]/(pars['por'] * pars['s'] * pars['v_cell'] * 1000.0) # [M]
+
+		# Constants
+		L_water = pars['por'] * pars['s'] * pars['v_cell'] * 1000.0 # L_water from m^3_water
 		cnv_mobileImmobile = pars['por'] * pars['s'] * 1000.0 # L_h20/m^3_bulk
 		
-		mu_B = pars['lambda_B1'] * B * D/(D + pars['K_D']) * (pars['K_B'] / (pars['K_B'] + B))**pars['alpha'] * pars['K_I']/(pars['K_I'] + I) # [mol/m^3_bulk/s]
+		# DERIVATIVES [mol/s]
+		r_s2o4_disp = pars['k_s2o4_disp'] * s2o4 * L_water
 
-		mu_CD = pars['gamma_CD'] * C * D # [mol/L_water/s]
-
-		# MOBILE DERIVATIVES [mol/L_water/s]
-		ds2o4_dt = pars['k_s2o4_disp'] * s2o4 # mole/l-s
-
-		return [ds2o4_dt*L_water]
+		return [r_s2o4_disp, -r_s2o4_disp, 0.5*r_s2o4_disp, r_s2o4_disp]
 	
-	return chrotran_sandbox
+	return dithionite_sandbox
 
 def run_ode(init, pars, sopt, function):
 	# solver = odespy.RK4(function)
 	solver = odespy.CashKarp(function)
 	solver.set_initial_condition([
-		init['s2o4'], # [M]
+		init['h']    * pars['por'] * pars['s'] * pars['v_cell'] * 1000.0, # moles
+		init['s2o4'] * pars['por'] * pars['s'] * pars['v_cell'] * 1000.0, # moles, # moles
+		init['s2o3'] * pars['por'] * pars['s'] * pars['v_cell'] * 1000.0, # moles, # moles
+		init['so3']  * pars['por'] * pars['s'] * pars['v_cell'] * 1000.0, # moles, # moles
 		# init['chubbite_vf'],
 		])
 
