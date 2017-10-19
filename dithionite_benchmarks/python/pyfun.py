@@ -8,7 +8,8 @@ liter_b_to_m3_b = 1e3
 def make_dithionite_sandbox(pars):
 	def dithionite_sandbox(u, t):
 		# Concentrations
-		s2o4 = u[1]/(pars['por'] * pars['s'] * pars['v_cell'] * 1000.0) # [M]
+		o2 = u[1]/(pars['por'] * pars['s'] * pars['v_cell'] * 1000.0) # [M]
+		s2o4 = u[4]/(pars['por'] * pars['s'] * pars['v_cell'] * 1000.0) # [M]
 
 		# Constants
 		L_water = pars['por'] * pars['s'] * pars['v_cell'] * 1000.0 # L_water from m^3_water
@@ -16,8 +17,21 @@ def make_dithionite_sandbox(pars):
 		
 		# DERIVATIVES [mol/s]
 		r_s2o4_disp = pars['k_s2o4_disp'] * s2o4 * L_water
+		r_s2o4_o2 = pars['k_s2o4_o2'] * s2o4 * o2 * L_water
 
-		return [r_s2o4_disp, -r_s2o4_disp, 0.5*r_s2o4_disp, r_s2o4_disp]
+		return [r_s2o4_disp + 2.0*r_s2o4_o2, # H+'
+				0.0 -r_s2o4_o2, # O2(aq)
+				0.0, # CrO4--
+				0.0, # Cr+++
+				-r_s2o4_disp - r_s2o4_o2, # S2O4--
+				0.5*r_s2o4_disp, # S2O3--
+				r_s2o4_disp+r_s2o4_o2, # SO3--
+				r_s2o4_o2, # SO4--
+				0.0, # Fe+++
+				0.0, # Fe++
+				0.0, # fast_Fe++
+				0.0, # slow_Fe++
+				]
 	
 	return dithionite_sandbox
 
@@ -25,11 +39,21 @@ def run_ode(init, pars, sopt, function):
 	# solver = odespy.RK4(function)
 	solver = odespy.CashKarp(function)
 	solver.set_initial_condition([
-		init['h']    * pars['por'] * pars['s'] * pars['v_cell'] * 1000.0, # moles
-		init['s2o4'] * pars['por'] * pars['s'] * pars['v_cell'] * 1000.0, # moles, # moles
-		init['s2o3'] * pars['por'] * pars['s'] * pars['v_cell'] * 1000.0, # moles, # moles
-		init['so3']  * pars['por'] * pars['s'] * pars['v_cell'] * 1000.0, # moles, # moles
-		# init['chubbite_vf'],
+		# MOBILE SPECIES
+		init['H+']     * pars['por'] * pars['s'] * pars['v_cell'] * 1000.0, # 0 moles
+		init['O2(aq)'] * pars['por'] * pars['s'] * pars['v_cell'] * 1000.0, # 1 moles
+		init['CrO4--'] * pars['por'] * pars['s'] * pars['v_cell'] * 1000.0, # 2 moles
+		init['Cr+++']  * pars['por'] * pars['s'] * pars['v_cell'] * 1000.0, # 3 moles
+		init['S2O4--'] * pars['por'] * pars['s'] * pars['v_cell'] * 1000.0, # 4 moles
+		init['S2O3--'] * pars['por'] * pars['s'] * pars['v_cell'] * 1000.0, # 5 moles
+		init['SO3--']  * pars['por'] * pars['s'] * pars['v_cell'] * 1000.0, # 6 moles
+		init['SO4--']  * pars['por'] * pars['s'] * pars['v_cell'] * 1000.0, # 7 moles
+		init['Fe+++']  * pars['por'] * pars['s'] * pars['v_cell'] * 1000.0, # 8 moles
+		init['Fe++']   * pars['por'] * pars['s'] * pars['v_cell'] * 1000.0, # 9 moles
+
+		# IMMOBILE SPECIES
+		init['fast_Fe++'], # 10 m^3/m^3_bulk
+		init['slow_Fe++'] # 11 m^3/m^3_bulk
 		])
 
 	time_points = np.linspace(0,sopt['T'],sopt['N']+1)

@@ -236,7 +236,7 @@ subroutine S2o4_o2React(this,Residual,Jacobian,compute_derivative, &
   !   rate = this%rate_constant*(rt_auxvar%pri_molal(this%id_spec_s2o4)+1.d-20)**1.5
   ! endif
 
-  rate = this%rate_constant*(rt_auxvar%pri_molal(this%id_spec_s2o4))**1.5*rt_auxvar%pri_molal(this%id_spec_o2)
+  rate = this%rate_constant*(rt_auxvar%pri_molal(this%id_spec_s2o4))*rt_auxvar%pri_molal(this%id_spec_o2)
 
   if (rate < this%eps) then
     rate = 0.d0

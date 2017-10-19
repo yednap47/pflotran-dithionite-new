@@ -28,7 +28,7 @@ CHEMISTRY
   /
   REACTION_SANDBOX
     S2O4_DISP
-      RATE_CONSTANT 1.d-5 # /s, Istok (1999), 0.13 /hr
+      RATE_CONSTANT 1.d-5
       EPS 1.d-100
     /
   /
@@ -143,7 +143,7 @@ END
 #=========================== constraints ======================================
 CONSTRAINT initial
   CONCENTRATIONS
-    H+      1.0d-11 T
+    H+      1.d-11 T
     S2O4--  1.d-1 T
     S2O3--  1.d-20 T
     SO3--   1.d-20 T
