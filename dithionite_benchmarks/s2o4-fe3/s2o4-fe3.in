@@ -1,4 +1,4 @@
-# Id: s2o4-o2.in, Mon 24 Apr 2017 01:09:25 PM MDT pandeys #
+# Id: s2o4-fe3.in, Mon 24 Apr 2017 01:11:19 PM MDT pandeys #
 # Created by Sachin Pandey, LANL
 # Description:
 #------------------------------------------------------------------------------
@@ -32,14 +32,28 @@ CHEMISTRY
     Fe+++
     Fe++
   /
+  SECONDARY_SPECIES
+    OH-
+  /
   IMMOBILE_SPECIES
     fast_Fe++
     slow_Fe++
   /
   REACTION_SANDBOX
-    S2O4_O2
-      RATE_CONSTANT 1.d-3
+    S2O4_FE3
+      RATE_CONSTANT 1.0e-7 # /s
+      SSA 175 # m^2/g
+      ROCK_DENSITY 1000.d0 # m^3/m^3_bulk
+      FRACTION 0.6
       EPS 1.d-100
+    /
+  /
+  MINERALS
+    Fe(OH)3(s)
+  /
+  MINERAL_KINETICS
+    Fe(OH)3(s)
+      RATE_CONSTANT 0.d0 mol/m^2-sec
     /
   /
   DATABASE ../../database/chromium_dithionite.dat
@@ -154,19 +168,22 @@ END
 CONSTRAINT initial
   CONCENTRATIONS
     H+      1.d-11 T
-    O2(aq)  1.d-3 T
+    O2(aq)  1.d-20 T
     CrO4--  1.d-20 T
     Cr+++   1.d-20 T
-    S2O4--  1.d-2 T
+    S2O4--  1.d-1 T
     S2O3--  1.d-20 T
     SO3--   1.d-20 T
     SO4--   1.d-20 T
     Fe+++   1.d-20 T
     Fe++    1.d-20 T
   /
+  MINERALS
+    Fe(OH)3(s) 5.d-2 1.d0
+  /
   IMMOBILE
-    fast_Fe++ 1.d-20
-    slow_Fe++ 1.d-20
+    fast_Fe++ 1.d-20 # mol/m^3_bulk
+    slow_Fe++ 1.d-20 # mol/m^3_bulk
   /
 END
 

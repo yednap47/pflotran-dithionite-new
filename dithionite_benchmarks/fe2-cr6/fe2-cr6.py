@@ -23,10 +23,10 @@ pars = {'s'					: 1.0, # saturation
 		'k_s2o4_disp'		: 0.0, # [/s]
 		'k_s2o4_o2'			: 0.0, # [/s]
 		'k_s2o4_fe3'		: 0.0, # [/s]
-		'k_fe2_o2_fast'		: 1.e0, # [/s]
-		'k_fe2_o2_slow'		: 1.e-1, # [/s]
-		'k_fe2_cr6_fast'	: 0.0, # [/s]
-		'k_fe2_cr6_slow'	: 0.0, # [/s]
+		'k_fe2_o2_fast'		: 0.0, # [/s]
+		'k_fe2_o2_slow'		: 0.0, # [/s]
+		'k_fe2_cr6_fast'	: 1.e0, # [/s]
+		'k_fe2_cr6_slow'	: 5.e-1, # [/s]
 
 		'ssa_feoh3'			: 175.0, # [m^2/g]
 		'alpha'				: 0.6, # [/s]
@@ -41,8 +41,8 @@ sopt = {'T' :	10.0 * 24 * 60 * 60, # end of simulation [s from d]
 
 # Initial conditions
 init = {'H+'		: 1.e-11, # [M]
-		'O2(aq)'	: 1.e-2, # [M]
-		'CrO4--'	: 1.e-20, # [M]
+		'O2(aq)'	: 1.e-20, # [M]
+		'CrO4--'	: 1.e-2, # [M]
 		'Cr+++'		: 1.e-20, # [M]
 		'S2O4--'	: 1.e-20, # [M]
 		'S2O3--'	: 1.e-20, # [M]
@@ -62,7 +62,7 @@ L_water = pars['v_cell'] * pars['por'] * pars['s'] * 1.e3 # [L]
 results_ode = {}
 results_ode['time'] = t/3600/24 # [d from s]
 results_ode['H+'] = u[:,0]/L_water
-results_ode['O2(aq)'] = u[:,1]/L_water
+results_ode['CrO4--'] = u[:,2]/L_water
 results_ode['Fe+++'] = u[:,8]/L_water
 results_ode['fast_Fe++'] = u[:,10]/pars['v_cell']
 results_ode['slow_Fe++'] = u[:,11]/pars['v_cell']
@@ -70,9 +70,9 @@ results_ode['slow_Fe++'] = u[:,11]/pars['v_cell']
 # ------------------------------------------------------------------------------
 # Compare with pflotran simulation
 # ------------------------------------------------------------------------------
-simbasename = "fe2-o2"
+simbasename = "fe2-cr6"
 observation_filename = [simbasename + '-obs-0.tec']
-variable_list = ['Total H+ [M]', 'Total O2(aq) [M]', 'Total Fe+++ [M]', 'fast_Fe++ [mol/m^3]', 'slow_Fe++ [mol/m^3]']
+variable_list = ['Total H+ [M]', 'Total CrO4-- [M]', 'Total Fe+++ [M]', 'fast_Fe++ [mol/m^3]', 'slow_Fe++ [mol/m^3]']
 observation_list = ['obs (1)']
 results_pflotran =  pf.getobsdata(variable_list=variable_list,observation_list=observation_list,observation_filenames=observation_filename)
 
@@ -97,8 +97,8 @@ pf.plot_benchmarks(ax, results_ode=results_ode, results_pflotran=results_pflotra
 ax = fig.add_subplot(2, 3, 2)
 pflo_plotvars = [[variable_list[1]], observation_list]
 pflo_plotvars = list(it.product(*pflo_plotvars))
-ode_plotvars = ['O2(aq)']
-legend_list = ['O2(aq), PFLOTRAN','O2(aq), odespy']
+ode_plotvars = ['CrO4--']
+legend_list = ['CrO4--, PFLOTRAN','CrO4--, odespy']
 # 
 pf.plot_benchmarks(ax, results_ode=results_ode, results_pflotran=results_pflotran, ode_plotvars=ode_plotvars, pflo_plotvars=pflo_plotvars, legend_list=legend_list, xlabel="Time [d]",ylabel="Concentration [M]", xlims=xlims, skipfactor=skipfactor, fontsize=fontsize)
 
@@ -129,6 +129,6 @@ legend_list = ['slow_Fe++, PFLOTRAN','slow_Fe++, odespy']
 # 
 pf.plot_benchmarks(ax, results_ode=results_ode, results_pflotran=results_pflotran, ode_plotvars=ode_plotvars, pflo_plotvars=pflo_plotvars, legend_list=legend_list, xlabel="Time [d]",ylabel="Concentration [mol/m^3_bulk]", xlims=xlims, skipfactor=skipfactor, fontsize=fontsize)
 
-plt.suptitle("Fe(II) sediments oxidized by O2(aq)")
+plt.suptitle("Cr(VI) reduced by Fe(II) sediments")
 plt.tight_layout(rect=[0, 0.03, 1, 0.95])
 plt.savefig(simbasename + '.png')

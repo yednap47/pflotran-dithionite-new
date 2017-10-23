@@ -1,4 +1,4 @@
-# Id: s2o4-o2.in, Mon 24 Apr 2017 01:09:25 PM MDT pandeys #
+# Id: fe2-cr6.in, Mon 24 Apr 2017 01:11:19 PM MDT pandeys #
 # Created by Sachin Pandey, LANL
 # Description:
 #------------------------------------------------------------------------------
@@ -32,13 +32,18 @@ CHEMISTRY
     Fe+++
     Fe++
   /
+  SECONDARY_SPECIES
+    OH-
+  /
   IMMOBILE_SPECIES
     fast_Fe++
     slow_Fe++
   /
   REACTION_SANDBOX
-    S2O4_O2
-      RATE_CONSTANT 1.d-3
+    FE2_CR6
+      RATE_CONSTANT_FAST 1.d0  # /s
+      RATE_CONSTANT_SLOW 5.d-1 # /s
+      ROCK_DENSITY 1000.d0 # m^3/m^3_bulk
       EPS 1.d-100
     /
   /
@@ -154,10 +159,10 @@ END
 CONSTRAINT initial
   CONCENTRATIONS
     H+      1.d-11 T
-    O2(aq)  1.d-3 T
-    CrO4--  1.d-20 T
+    O2(aq)  1.d-20 T
+    CrO4--  1.d-2 T
     Cr+++   1.d-20 T
-    S2O4--  1.d-2 T
+    S2O4--  1.d-20 T
     S2O3--  1.d-20 T
     SO3--   1.d-20 T
     SO4--   1.d-20 T
@@ -165,8 +170,8 @@ CONSTRAINT initial
     Fe++    1.d-20 T
   /
   IMMOBILE
-    fast_Fe++ 1.d-20
-    slow_Fe++ 1.d-20
+    fast_Fe++ 60.0d0 # mol/m^3_bulk
+    slow_Fe++ 40.0d0 # mol/m^3_bulk
   /
 END
 

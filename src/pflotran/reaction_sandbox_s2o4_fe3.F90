@@ -32,12 +32,12 @@ module Reaction_Sandbox_S2o4_fe3_class
     character(len=MAXWORDLENGTH) :: name_spec_s2o4 ! S2O4--
     character(len=MAXWORDLENGTH) :: name_spec_h ! H+
     character(len=MAXWORDLENGTH) :: name_spec_so3 ! SO3--
-    character(len=MAXWORDLENGTH) :: name_spec_fe2 ! Fe++
     character(len=MAXWORDLENGTH) :: name_mnrl_fe3 ! Fe(OH)3(s)
-    character(len=MAXWORDLENGTH) :: name_bound_fe2 ! bound_Fe++
-    PetscInt :: id_spec_s2o4, id_spec_h, id_spec_so3, id_spec_fe2
-    PetscInt :: id_mnrl_fe3, id_bound_fe2
-    PetscReal :: rate_constant, ssa, rock_density, boundfrac, eps
+    character(len=MAXWORDLENGTH) :: name_bound_fe2_slow ! bound_Fe++ SLOW
+    character(len=MAXWORDLENGTH) :: name_bound_fe2_fast ! bound_Fe++ FAST
+    PetscInt :: id_spec_s2o4, id_spec_h, id_spec_so3
+    PetscInt :: id_mnrl_fe3, id_bound_fe2_slow, id_bound_fe2_fast
+    PetscReal :: rate_constant, ssa, rock_density, sitefrac, eps
   contains
     procedure, public :: ReadInput => S2o4_fe3Read
     procedure, public :: Setup => S2o4_fe3Setup
@@ -70,19 +70,19 @@ function S2o4_fe3Create()
   S2o4_fe3Create%name_spec_s2o4 = ''
   S2o4_fe3Create%name_spec_h = ''
   S2o4_fe3Create%name_spec_so3 = ''
-  S2o4_fe3Create%name_spec_fe2 = ''
   S2o4_fe3Create%name_mnrl_fe3 = ''
-  S2o4_fe3Create%name_bound_fe2 = ''
+  S2o4_fe3Create%name_bound_fe2_slow = ''
+  S2o4_fe3Create%name_bound_fe2_fast = ''
   S2o4_fe3Create%id_spec_s2o4 = 0
   S2o4_fe3Create%id_spec_h = 0
   S2o4_fe3Create%id_spec_so3 = 0
-  S2o4_fe3Create%id_spec_fe2 = 0
   S2o4_fe3Create%id_mnrl_fe3 = 0
-  S2o4_fe3Create%id_bound_fe2 = 0
+  S2o4_fe3Create%id_bound_fe2_slow = 0
+  S2o4_fe3Create%id_bound_fe2_fast = 0
   S2o4_fe3Create%rate_constant = 0.d0
   S2o4_fe3Create%ssa = 0.d0
   S2o4_fe3Create%rock_density = 0.d0
-  S2o4_fe3Create%boundfrac = 0.d0
+  S2o4_fe3Create%sitefrac = 0.d0
   S2o4_fe3Create%eps = 0.d0
 
   nullify(S2o4_fe3Create%next)
@@ -158,7 +158,7 @@ subroutine S2o4_fe3Read(this,input,option)
         call InputErrorMsg(input,option,'ROCK_DENSITY', &
                            'CHEMISTRY,REACTION_SANDBOX,S2O4_FE3')
       case('FRACTION')
-        call InputReadDouble(input,option,this%boundfrac)
+        call InputReadDouble(input,option,this%sitefrac)
         call InputErrorMsg(input,option,'FRACTION', &
                            'CHEMISTRY,REACTION_SANDBOX,S2O4_FE3')
       case('EPS')
@@ -200,9 +200,9 @@ subroutine S2o4_fe3Setup(this,reaction,option)
   this%name_spec_s2o4 = 'S2O4--'
   this%name_spec_h    = 'H+'
   this%name_spec_so3  = 'SO3--'
-  this%name_spec_fe2  = 'Fe++'
   this%name_mnrl_fe3  = 'Fe(OH)3(s)'
-  this%name_bound_fe2  = 'sbFe++'
+  this%name_bound_fe2_slow  = 'slow_Fe++'
+  this%name_bound_fe2_fast  = 'fast_Fe++'
   
   ! Aqueous species
   this%id_spec_s2o4 = &
@@ -211,16 +211,17 @@ subroutine S2o4_fe3Setup(this,reaction,option)
       GetPrimarySpeciesIDFromName(this%name_spec_h,reaction,option)
   this%id_spec_so3 = &
       GetPrimarySpeciesIDFromName(this%name_spec_so3,reaction,option)
-  this%id_spec_fe2 = &
-      GetPrimarySpeciesIDFromName(this%name_spec_fe2,reaction,option)
 
   ! Mineral species
   this%id_mnrl_fe3 = &
     GetMineralIDFromName(this%name_mnrl_fe3,reaction%mineral,option)
 
   ! Immobile species
-  this%id_bound_fe2 = &
-    GetImmobileSpeciesIDFromName(this%name_bound_fe2,reaction%immobile,option)
+  this%id_bound_fe2_slow = &
+    GetImmobileSpeciesIDFromName(this%name_bound_fe2_slow,reaction%immobile,option)
+  this%id_bound_fe2_fast = &
+    GetImmobileSpeciesIDFromName(this%name_bound_fe2_fast,reaction%immobile,option)
+
 
 end subroutine S2o4_fe3Setup
 
@@ -256,13 +257,14 @@ subroutine S2o4_fe3React(this,Residual,Jacobian,compute_derivative, &
   PetscInt, parameter :: iphase = 1
   PetscReal :: L_water, FeII, FeIII, rate
   PetscReal :: vf_feoh3, mv_feoh3, mw_feoh3
-  PetscInt :: id_bound_fe2
+  PetscInt :: id_bound_fe2_slow_offset, id_bound_fe2_fast_offset
 
   ! Info for Fe(oh)3(s) and bound_Fe++
   vf_feoh3 = rt_auxvar%mnrl_volfrac(this%id_mnrl_fe3) ! m^3/m^3_bulk
   mv_feoh3 = reaction%mineral%kinmnrl_molar_vol(this%id_mnrl_fe3) ! m^3/mol
   mw_feoh3 = reaction%mineral%kinmnrl_molar_wt(this%id_mnrl_fe3) ! m^3/mol
-  id_bound_fe2 = reaction%offset_immobile + this%id_bound_fe2
+  id_bound_fe2_slow_offset = reaction%offset_immobile + this%id_bound_fe2_slow
+  id_bound_fe2_fast_offset = reaction%offset_immobile + this%id_bound_fe2_fast
 
   L_water = material_auxvar%porosity*global_auxvar%sat(iphase)* &
             material_auxvar%volume*1.d3 ! L_water from m^3_water
@@ -295,8 +297,8 @@ subroutine S2o4_fe3React(this,Residual,Jacobian,compute_derivative, &
   Residual(this%id_spec_s2o4) = Residual(this%id_spec_s2o4) - (-1.0*rate) * L_water
   Residual(this%id_spec_h) = Residual(this%id_spec_h) - (-2.0*rate) * L_water
   Residual(this%id_spec_so3) = Residual(this%id_spec_so3) - (2.0*rate) * L_water
-  Residual(this%id_spec_fe2) = Residual(this%id_spec_fe2) - (2.0*rate) * L_water * (1-this%boundfrac)
-  Residual(id_bound_fe2) = Residual(id_bound_fe2) - (2.0*rate) * L_water * this%boundfrac
+  Residual(id_bound_fe2_slow_offset) = Residual(id_bound_fe2_slow_offset) - (2.0*rate*L_water) * (1-this%sitefrac)
+  Residual(id_bound_fe2_fast_offset) = Residual(id_bound_fe2_fast_offset) - (2.0*rate*L_water) * this%sitefrac
 
   if (compute_derivative) then
 

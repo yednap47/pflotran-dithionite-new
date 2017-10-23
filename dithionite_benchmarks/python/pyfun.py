@@ -9,9 +9,11 @@ def make_dithionite_sandbox(pars):
 	def dithionite_sandbox(u, t):
 		# Concentrations
 		o2 = u[1]/(pars['por'] * pars['s'] * pars['v_cell'] * 1000.0) # [M]
+		cr6 = u[2]/(pars['por'] * pars['s'] * pars['v_cell'] * 1000.0) # [M]
 		s2o4 = u[4]/(pars['por'] * pars['s'] * pars['v_cell'] * 1000.0) # [M]
-		fe2_fast = u[10]/(pars['rho_rock']*1000) # mol_reactant/g_sed fro m^3/m^3_bulk
-		fe2_slow = u[11]/(pars['rho_rock']*1000) # mol_reactant/g_sed fro m^3/m^3_bulk
+		fe2_fast = u[10]/(pars['rho_rock']*1000) # mol_reactant/g_sed from m^3/m^3_bulk
+		fe2_slow = u[11]/(pars['rho_rock']*1000) # mol_reactant/g_sed from m^3/m^3_bulk
+		feoh3_s = u[12]/pars['mv_feoh3']/pars['rho_rock']/1.e3*pars['mw_feoh3'] # g_fe(oh)3/g_sed from from m^3_mnrl/m^3_bulk
 
 		# Constants
 		L_water = pars['por'] * pars['s'] * pars['v_cell'] * 1000.0 # L_water from m^3_water
@@ -22,19 +24,23 @@ def make_dithionite_sandbox(pars):
 		r_s2o4_o2 = pars['k_s2o4_o2'] * s2o4 * o2 * L_water
 		r_fe2_o2_fast = pars['k_fe2_o2_fast'] * fe2_fast * o2 * L_water
 		r_fe2_o2_slow = pars['k_fe2_o2_slow'] * fe2_slow * o2 * L_water
+		r_fe2_cr6_fast = pars['k_fe2_cr6_fast'] * fe2_fast * cr6 * L_water
+		r_fe2_cr6_slow = pars['k_fe2_cr6_slow'] * fe2_slow * cr6 * L_water
+		r_s2o4_fe3 = pars['k_s2o4_fe3'] * pars['ssa_feoh3'] * s2o4 * feoh3_s * L_water
 
-		return [r_s2o4_disp +2.0*r_s2o4_o2 -(r_fe2_o2_fast+r_fe2_o2_slow), # H+'
+		return [r_s2o4_disp +2.0*r_s2o4_o2 -(r_fe2_o2_fast+r_fe2_o2_slow) -2.66*(r_fe2_cr6_fast+r_fe2_cr6_slow) -2.0*r_s2o4_fe3, # H+'
 				-r_s2o4_o2 -0.25*(r_fe2_o2_fast+r_fe2_o2_slow), # O2(aq)
-				0.0, # CrO4--
-				0.0, # Cr+++
-				-r_s2o4_disp - r_s2o4_o2, # S2O4--
+				-0.33*(r_fe2_cr6_fast+r_fe2_cr6_slow), # CrO4--
+				0.33*(r_fe2_cr6_fast+r_fe2_cr6_slow), # Cr+++
+				-r_s2o4_disp -r_s2o4_o2 -r_s2o4_fe3, # S2O4--
 				0.5*r_s2o4_disp, # S2O3--
-				r_s2o4_disp+r_s2o4_o2, # SO3--
+				r_s2o4_disp +r_s2o4_o2 +2.0*r_s2o4_fe3, # SO3--
 				r_s2o4_o2, # SO4--
-				(r_fe2_o2_fast+r_fe2_o2_slow), # Fe+++
+				(r_fe2_o2_fast+r_fe2_o2_slow) +(r_fe2_cr6_fast+r_fe2_cr6_slow), # Fe+++
 				0.0, # Fe++
-				-r_fe2_o2_fast, # fast_Fe++
-				-r_fe2_o2_slow # slow_Fe++
+				-r_fe2_o2_fast -r_fe2_cr6_fast +2.0*r_s2o4_fe3*pars['alpha'], # fast_Fe++
+				-r_fe2_o2_slow -r_fe2_cr6_slow +2.0*r_s2o4_fe3*(1-pars['alpha']), # slow_Fe++
+				-2.0*r_s2o4_fe3/L_water*cnv_mobileImmobile*pars['mv_feoh3'] #  Fe(OH)3_s [m^3 mnrl/m^3 bulk/s]
 				]
 	
 	return dithionite_sandbox
@@ -57,7 +63,10 @@ def run_ode(init, pars, sopt, function):
 
 		# IMMOBILE SPECIES
 		init['fast_Fe++'] * pars['v_cell'], # 10 moles
-		init['slow_Fe++'] * pars['v_cell'] # 11 moles
+		init['slow_Fe++'] * pars['v_cell'], # 11 moles
+
+		# MINERAL SPECIES
+		init['Fe(OH)3_s'] # 12 m^3/m^3_bulk
 		])
 
 	time_points = np.linspace(0,sopt['T'],sopt['N']+1)
