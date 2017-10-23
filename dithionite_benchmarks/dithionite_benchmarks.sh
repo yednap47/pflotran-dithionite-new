@@ -25,6 +25,11 @@ cd ../fe2-cr6
 ../../src/pflotran/pflotran -pflotranin fe2-cr6.in >/dev/null 2>/dev/null
 python fe2-cr6.py
 
+echo 1d_parameterTest
+cd ../1d_parameterTest
+mpirun -np 8 ../../src/pflotran/pflotran -pflotranin 1d-allReactions-10m-uniformVelocity.in >/dev/null 2>/dev/null
+julia plot.jl 1d-allReactions-10m-uniformVelocity
+
 cd ..
 
 if [ -d "results_benchmark" ]; then
