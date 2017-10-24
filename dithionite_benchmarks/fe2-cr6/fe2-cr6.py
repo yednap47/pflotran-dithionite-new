@@ -16,9 +16,9 @@ import pyfun as pf
 # ------------------------------------------------------------------------------
 # Parameters
 pars = {'s'					: 1.0, # saturation
-		'por'				: 0.25, # porosity
+		'por'				: 0.15, # porosity
 		'v_cell'			: 1.0, # m^3_bulk
-		'rho_rock'			: 1.e3, # kg/m^3_bulk
+		'rho_rock'			: 1200.0, # kg/m^3_bulk
 
 		'k_s2o4_disp'		: 0.0, # [/s]
 		'k_s2o4_o2'			: 0.0, # [/s]

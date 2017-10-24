@@ -6,14 +6,15 @@ module Reaction_Sandbox_module
   use Reaction_Sandbox_Example_class
   use Reaction_Sandbox_Simple_class
   use Reaction_Sandbox_Cyber_class
+
+  ! Add new reacton sandbox classes here.
   use Reaction_Sandbox_S2o4_fe3_class
   use Reaction_Sandbox_S2o4_o2_class
   use Reaction_Sandbox_S2o4_disp_class
   use Reaction_Sandbox_Fe2_o2_class
   use Reaction_Sandbox_Fe2_cr6_class
-  
-  ! Add new reacton sandbox classes here.
-  
+  use Reaction_Sandbox_Dithionite_class
+
   use PFLOTRAN_Constants_module
 
   implicit none
@@ -178,6 +179,8 @@ subroutine RSandboxRead2(local_sandbox_list,input,option)
         new_sandbox => Fe2_o2Create()
       case('FE2_CR6')
         new_sandbox => Fe2_cr6Create()
+      case('DITHIONITE_PARAMETERS')
+        new_sandbox => DithioniteCreate()
       case default
         call InputKeywordUnrecognized(word,'CHEMISTRY,REACTION_SANDBOX',option)
     end select

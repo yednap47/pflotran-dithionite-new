@@ -19,7 +19,7 @@ myvar = [
 ]
 
 coord_name = "X"
-mytime = [37.0,73.0,110.0,146.0,183.0,219.0,256.0,292.0,329.0]
+mytime = [10.0,40.0,325.0]
 timeunits = "days"
 mysize = 11
 
@@ -46,3 +46,17 @@ end
 plt.legend(loc=0,frameon=false,fontsize=mysize)
 plt.tight_layout(h_pad=.1)
 plt.savefig("$(filename).png",dpi=600)
+plt.close()
+
+# Compare with gold standard file
+myvar = ["east CrO4-- [mol/d]"]
+redo = Pflotran.readObsDataset(filename * "-mas.dat",myvar;dataframe=false)
+plt.plot(redo[:,1],-redo[:,2],"--",label = "new simulation")
+gold = Pflotran.readObsDataset(filename * "-mas.dat.gold",myvar;dataframe=false)
+plt.scatter(gold[1:10:end,1],-gold[1:10:end,2],c="b",label = "gold standard")
+plt.xlim(0,365)
+plt.legend()
+plt.xlabel("Time [d]")
+plt.ylabel(myvar[1])
+plt.tight_layout()
+plt.savefig("$(filename)-regression.png",dpi=600)

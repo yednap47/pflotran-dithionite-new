@@ -32,14 +32,34 @@ CHEMISTRY
     Fe+++
     Fe++
   /
+  SECONDARY_SPECIES
+    OH-
+  /
   IMMOBILE_SPECIES
     fast_Fe++
     slow_Fe++
   /
   REACTION_SANDBOX
-    S2O4_O2
-      RATE_CONSTANT 1.d-3
-      EPS 1.d-100
+    DITHIONITE_PARAMETERS
+      K_S2O4_DISP       0.0
+      K_S2O4_O2         1.d-3
+      K_S2O4_FE3        0.0
+      K_FE2_O2_FAST     0.0
+      K_FE2_O2_SLOW     0.0
+      K_FE2_CR6_FAST    0.0
+      K_FE2_CR6_SLOW    0.0
+      ROCK_DENSITY      1200.d0   # kg/m^3_bulk
+      SSA_FEOH3         175.d0    # m^2/g
+      ALPHA             6.d-01
+      EPS               1.d-100
+    /
+  /
+  MINERALS
+    Fe(OH)3(s)
+  /
+  MINERAL_KINETICS
+    Fe(OH)3(s)
+      RATE_CONSTANT 0.d0 mol/m^2-sec
     /
   /
   DATABASE ../../database/chromium_dithionite.dat
@@ -82,7 +102,7 @@ END
 #=========================== material properties ==============================
 MATERIAL_PROPERTY saprolite
   ID 1
-  POROSITY 0.25
+  POROSITY 0.15
   TORTUOSITY 1.d0
   PERMEABILITY
     PERM_ISO 1.d-12
@@ -167,6 +187,9 @@ CONSTRAINT initial
   IMMOBILE
     fast_Fe++ 1.d-20
     slow_Fe++ 1.d-20
+  /
+  MINERALS
+    Fe(OH)3(s) 1.d-20 1.0
   /
 END
 

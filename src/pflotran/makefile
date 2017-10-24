@@ -351,6 +351,7 @@ chem_obj = \
 	${common_src}reaction_sandbox_s2o4_disp.o \
 	${common_src}reaction_sandbox_fe2_o2.o \
 	${common_src}reaction_sandbox_fe2_cr6.o \
+	${common_src}reaction_sandbox_dithionite.o \
 	${common_src}reaction_solid_solution.o \
 	${common_src}reaction_solid_solution_aux.o \
 	${common_src}reaction_surf_complex.o \
@@ -1265,6 +1266,7 @@ reaction_sandbox.o : global_aux.o input_aux.o material_aux.o option.o \
                      reaction_sandbox_s2o4_disp.o \
                      reaction_sandbox_fe2_o2.o \
                      reaction_sandbox_fe2_cr6.o \
+                     reaction_sandbox_dithionite.o \
                      reactive_transport_aux.o string.o utility.o
 reaction_sandbox_base.o : global_aux.o input_aux.o material_aux.o option.o \
                           output_aux.o pflotran_constants.o reaction_aux.o \
@@ -1309,6 +1311,10 @@ reaction_sandbox_fe2_o2.o : global_aux.o input_aux.o material_aux.o option.o \
                              reaction_sandbox_base.o reactive_transport_aux.o \
                              string.o units.o
 reaction_sandbox_fe2_cr6.o : global_aux.o input_aux.o material_aux.o option.o \
+                             pflotran_constants.o reaction_aux.o \
+                             reaction_sandbox_base.o reactive_transport_aux.o \
+                             string.o units.o
+reaction_sandbox_dithionite.o : global_aux.o input_aux.o material_aux.o option.o \
                              pflotran_constants.o reaction_aux.o \
                              reaction_sandbox_base.o reactive_transport_aux.o \
                              string.o units.o
