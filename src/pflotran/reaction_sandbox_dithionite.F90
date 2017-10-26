@@ -38,12 +38,13 @@ module Reaction_Sandbox_Dithionite_class
     character(len=MAXWORDLENGTH) :: name_spec_so3 ! SO3--
     character(len=MAXWORDLENGTH) :: name_spec_so4 ! SO4--
     character(len=MAXWORDLENGTH) :: name_spec_fe3 ! Fe+++
-    character(len=MAXWORDLENGTH) :: name_spec_fe2 ! Fe++
+!    character(len=MAXWORDLENGTH) :: name_spec_fe2 ! Fe++
     character(len=MAXWORDLENGTH) :: name_bound_fe2_fast ! bound_Fe++ FAST
     character(len=MAXWORDLENGTH) :: name_bound_fe2_slow ! bound_Fe++ SLOW
     character(len=MAXWORDLENGTH) :: name_mnrl_fe3 ! Fe(OH)3(s)
     PetscInt :: id_spec_h, id_spec_o2, id_spec_cr6, id_spec_cr3, id_spec_s2o4 
-    PetscInt :: id_spec_s2o3, id_spec_so3, id_spec_so4, id_spec_fe3, id_spec_fe2
+!    PetscInt :: id_spec_s2o3, id_spec_so3, id_spec_so4, id_spec_fe3, id_spec_fe2
+    PetscInt :: id_spec_s2o3, id_spec_so3, id_spec_so4, id_spec_fe3
     PetscInt :: id_mnrl_fe3, id_bound_fe2_fast, id_bound_fe2_slow
     PetscReal :: k_s2o4_disp, k_s2o4_o2, k_s2o4_fe3
     PetscReal :: k_fe2_o2_fast, k_fe2_o2_slow, k_fe2_cr6_fast, k_fe2_cr6_slow
@@ -87,7 +88,7 @@ function DithioniteCreate()
   DithioniteCreate%name_spec_so3 = '' ! SO3--
   DithioniteCreate%name_spec_so4 = '' ! SO4--
   DithioniteCreate%name_spec_fe3 = '' ! Fe+++
-  DithioniteCreate%name_spec_fe2 = '' ! Fe++
+!  DithioniteCreate%name_spec_fe2 = '' ! Fe++
   DithioniteCreate%name_bound_fe2_slow = '' ! bound_Fe++ SLOW
   DithioniteCreate%name_bound_fe2_fast = '' ! bound_Fe++ FAST
   DithioniteCreate%name_mnrl_fe3 = '' ! Fe(OH)3(s)
@@ -102,7 +103,7 @@ function DithioniteCreate()
   DithioniteCreate%id_spec_so3 = 0 ! SO3--
   DithioniteCreate%id_spec_so4 = 0 ! SO4--
   DithioniteCreate%id_spec_fe3 = 0 ! Fe+++
-  DithioniteCreate%id_spec_fe2 = 0 ! Fe++
+  !DithioniteCreate%id_spec_fe2 = 0 ! Fe++
   DithioniteCreate%id_bound_fe2_slow = 0 ! bound_Fe++ SLOW
   DithioniteCreate%id_bound_fe2_fast = 0 ! bound_Fe++ FAST
   DithioniteCreate%id_mnrl_fe3 = 0 ! Fe(OH)3(s)
@@ -248,7 +249,7 @@ subroutine DithioniteSetup(this,reaction,option)
   this%name_spec_so3 = 'SO3--'
   this%name_spec_so4 = 'SO4--'
   this%name_spec_fe3 = 'Fe+++'
-  this%name_spec_fe2 = 'Fe++'
+!  this%name_spec_fe2 = 'Fe++'
   this%name_bound_fe2_fast  = 'fast_Fe++'
   this%name_bound_fe2_slow  = 'slow_Fe++'
   this%name_mnrl_fe3  = 'Fe(OH)3(s)'
@@ -272,8 +273,8 @@ subroutine DithioniteSetup(this,reaction,option)
       GetPrimarySpeciesIDFromName(this%name_spec_so4,reaction,option)
   this%id_spec_fe3 = &
       GetPrimarySpeciesIDFromName(this%name_spec_fe3,reaction,option)
-  this%id_spec_fe2 = &
-      GetPrimarySpeciesIDFromName(this%name_spec_fe2,reaction,option)
+!  this%id_spec_fe2 = &
+!      GetPrimarySpeciesIDFromName(this%name_spec_fe2,reaction,option)
 
   ! Immobile species
   this%id_bound_fe2_fast = &
@@ -422,7 +423,7 @@ subroutine DithioniteReact(this,Residual,Jacobian,compute_derivative, &
   Residual(this%id_spec_fe3) = Residual(this%id_spec_fe3) - & 
     ((r_fe2_o2_fast+r_fe2_o2_slow) +(r_fe2_cr6_fast+r_fe2_cr6_slow))
 
-  Residual(this%id_spec_fe2) = Residual(this%id_spec_fe2) - 0.0
+!  Residual(this%id_spec_fe2) = Residual(this%id_spec_fe2) - 0.0
 
   Residual(id_bound_fe2_fast_offset) = Residual(id_bound_fe2_fast_offset) - &
     (-r_fe2_o2_fast -r_fe2_cr6_fast +2.0*r_s2o4_fe3*this%sitefrac)
