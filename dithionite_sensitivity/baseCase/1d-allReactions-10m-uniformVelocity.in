@@ -89,7 +89,7 @@ END
 #=========================== solver options ===================================
 NEWTON_SOLVER TRANSPORT
   ITOL_UPDATE 1.d-5
-  ITOL 1.d-12
+  ITOL 1.d-11
   RTOL 1.d-8
   STOL 1.d-30
 END

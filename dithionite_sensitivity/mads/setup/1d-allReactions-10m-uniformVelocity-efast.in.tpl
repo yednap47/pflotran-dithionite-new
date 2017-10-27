@@ -90,7 +90,7 @@ END
 #=========================== solver options ===================================
 NEWTON_SOLVER TRANSPORT
   ITOL_UPDATE 1.d-5
-  ITOL 1.d-12
+  ITOL 1.d-11
   RTOL 1.d-8
   STOL 1.d-30
 END
@@ -164,12 +164,12 @@ END
 
 #=========================== output options ===================================
 OUTPUT
-  FORMAT HDF5
+#  FORMAT HDF5
   VELOCITY_AT_CENTER
   PERIODIC TIME 1.d0 d
   PRINT_COLUMN_IDS
   MASS_BALANCE_FILE
-    PERIODIC TIME  1.d0 d
+  PERIODIC TIME 1.d0 d
   /
 END
 

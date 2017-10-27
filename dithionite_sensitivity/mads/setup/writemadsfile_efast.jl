@@ -14,7 +14,7 @@ targetsbasename = "syntheticdata-nn-skip0"
 # Default parameters for writing MADS file
 paramfilename = "../../parameters.xlsx"
 sheetname = "mads_tightened"
-jcommand = "read_data.jl"
+jcommand = "read_data_efast.jl"
 soltype = "external"
 startover = "true"
 
@@ -52,7 +52,7 @@ write(outfile, "- k_fe2_o2_slow: {exp: \"10^log_k_fe2_o2_fast*10^log_factor_k_fe
 write(outfile, "- k_fe2_cr6_slow: {exp: \"10^log_k_fe2_cr6_fast*10^log_factor_k_fe2_cr6_slow\"}\n")
 
 # Added function for initial [Na+]
-write(outfile, "- ina: {exp: \"2*10^log_is2o4\"}\n")
+# write(outfile, "- ina: {exp: \"2*10^log_is2o4\"}\n")
 
 # Finish writing mads file
 println(outfile,"Solution: $(soltype)")

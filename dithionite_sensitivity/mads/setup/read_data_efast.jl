@@ -1,5 +1,5 @@
 using HDF5
-import sachFun
+import Pflotran
 
 function readdata_efast(d)
     
@@ -25,7 +25,7 @@ function readdata_efast(d)
         np = 8
         maxruntime = 2.0 * 60.0 * 60.0 # seconds from hours
 
-        pfpath = "/lclscratch/sach/Programs/pflotran-dithionite/src/pflotran"
+        pfpath = "/lclscratch/sach/Programs/pflotran-dithionite-new/src/pflotran"
         masstag = casetag * "-mas.dat"
         otag = casetag * ".out"
         crtag = "Cr6_Obs_t"
@@ -51,7 +51,7 @@ function readdata_efast(d)
 
         # METHOD 2: USE THE MASS BALANCE FILE
         myvar = ["east CrO4-- [mol/d]"]
-        mydata = sachFun.readObsDataset(masstag,myvar)
+        mydata = Pflotran.readObsDataset(masstag,myvar)
         obstimes = mydata[:,1]
         targets = -mydata[:,2]
         for i in 1:length(obstimes)
