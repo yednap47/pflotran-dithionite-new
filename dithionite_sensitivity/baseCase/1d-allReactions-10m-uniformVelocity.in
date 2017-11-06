@@ -54,7 +54,7 @@ CHEMISTRY
       K_FE2_CR6_SLOW    1.00e-01
       ROCK_DENSITY      1200.d0   # kg/m^3_bulk
       SSA_FEOH3         175.d0    # m^2/g
-      ALPHA             6.d-01
+      ALPHA             5.d-01
       EPS               1.d-30
     /
   /

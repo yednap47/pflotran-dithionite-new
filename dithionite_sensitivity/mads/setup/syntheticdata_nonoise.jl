@@ -75,7 +75,7 @@ targetsfname = "syntheticdata"
 
 # User info for making synthetic data
 myvar = ["east CrO4-- [mol/d]"]
-skipfactor = 0 # resolution of targets vs simulation output
+skipfactor = 10 # resolution of targets vs simulation output
 caltag = "Cr6_Obs"
 timeUnits = "d"
 
