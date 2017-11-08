@@ -45,16 +45,16 @@ CHEMISTRY
   /
   REACTION_SANDBOX
     DITHIONITE_PARAMETERS
-      K_S2O4_DISP       3.61e-05
+      K_S2O4_DISP       1.00e-05
       K_S2O4_O2         1.00e0
       K_S2O4_FE3        1.00e-05
       K_FE2_O2_FAST     1.00e+01
       K_FE2_O2_SLOW     1.00e-01
       K_FE2_CR6_FAST    1.00e+01
       K_FE2_CR6_SLOW    1.00e-01
+      ALPHA             5.00e-01
       ROCK_DENSITY      1200.d0   # kg/m^3_bulk
       SSA_FEOH3         175.d0    # m^2/g
-      ALPHA             5.d-01
       EPS               1.d-30
     /
   /

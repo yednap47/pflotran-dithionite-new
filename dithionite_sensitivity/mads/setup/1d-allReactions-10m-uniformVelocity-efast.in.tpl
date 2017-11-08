@@ -53,9 +53,9 @@ CHEMISTRY
       K_FE2_O2_SLOW     !k_fe2_o2_slow!
       K_FE2_CR6_FAST    !k_fe2_cr6_fast!
       K_FE2_CR6_SLOW    !k_fe2_cr6_slow!
+      ALPHA             !fraction!
       ROCK_DENSITY      1200.d0   # kg/m^3_bulk
       SSA_FEOH3         175.d0    # m^2/g
-      ALPHA             !fraction!
       EPS               1.d-30
     /
   /
