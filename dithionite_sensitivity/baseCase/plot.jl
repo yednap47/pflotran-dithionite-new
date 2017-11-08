@@ -48,7 +48,8 @@ plt.tight_layout(h_pad=.1)
 plt.savefig("$(filename)-test.png",dpi=600)
 plt.close()
 
-# Compare with gold standard file
+# Plot curve used for mads sensitivity analysis
+masstag = "$(filename)-mas.dat"
 myvar = ["east CrO4-- [mol/d]"]
 redo = Pflotran.readObsDataset(filename * "-mas.dat",myvar;dataframe=false)
 plt.plot(redo[:,1],-redo[:,2],"--",label = "new simulation")
@@ -57,4 +58,25 @@ plt.legend()
 plt.xlabel("Time [d]")
 plt.ylabel(myvar[1])
 plt.tight_layout()
-plt.savefig("$(filename)-test2.png",dpi=600)
+plt.savefig("$(filename)-mads-sensitivity.png",dpi=600)
+plt.close()
+
+# Calculate parameters used in single parameter sensitivity analysis
+# Get the MAXIMUM amount of Fe reduced
+# Get the TOTAL amount of Cr(VI) that is untreated
+mytime = 365.0
+myvar = ["Global fast_Fe++", "Global slow_Fe++", "east CrO4-- [mol]", "east CrO4-- [mol/d]", "east Cr+++ [mol]"]
+sensresults_fe2 = Array{Float64}(0) # maximum surface bound fe2
+sensresults_cr6 = Array{Float64}(0) # moles of cr6 that reach the outflow
+obsresults = Pflotran.readObsDataset(masstag,myvar,dataframe=true)
+total_sboundfe2 = obsresults[Symbol("Global fast_Fe++")] + obsresults[Symbol("Global slow_Fe++")]
+sensresults_fe2 = append!(sensresults_fe2,[maximum(total_sboundfe2)])
+
+# find index of desired time in dataframe
+timeindex = find(x -> x == mytime,obsresults[:Time])
+sensresults_cr6 = append!(sensresults_cr6,-(obsresults[Symbol("east CrO4-- [mol]")][timeindex]))
+max_Fe2 = sensresults_fe2[1]
+tot_Cr6 = sensresults_cr6[1]
+
+print("Total Cr(VI) that leaves domain untreated = $(tot_Cr6)\n")
+print("Maximum Fe = $(max_Fe2)\n")
