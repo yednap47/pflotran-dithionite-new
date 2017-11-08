@@ -45,7 +45,7 @@ CHEMISTRY
   /
   REACTION_SANDBOX
     DITHIONITE_PARAMETERS
-      K_S2O4_DISP       1.00e-05
+      K_S2O4_DISP       3.1622776601683795e-5 # log10 = -4.5
       K_S2O4_O2         1.00e0
       K_S2O4_FE3        1.00e-05
       K_FE2_O2_FAST     1.00e+01
