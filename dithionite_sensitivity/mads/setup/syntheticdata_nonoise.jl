@@ -69,13 +69,13 @@ function writemadstargets(basedir::String, myvar::Array{String,1}, timeUnits::St
 end
 
 # general info
-basedir = "/lclscratch/sach/Programs/pflotran-dithionite-new/dithionite_sensitivity"
+basedir = "../.."
 simbasename = "1d-allReactions-10m-uniformVelocity"
 targetsfname = "syntheticdata"
 
 # User info for making synthetic data
 myvar = ["east CrO4-- [mol/d]"]
-skipfactor = 10 # resolution of targets vs simulation output
+skipfactor = 0 # resolution of targets vs simulation output
 caltag = "Cr6_Obs"
 timeUnits = "d"
 

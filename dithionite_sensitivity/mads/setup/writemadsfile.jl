@@ -6,7 +6,7 @@ import DataFrames
 # Initialize
 #------------------------------------------------------------------------------
 # general info
-basedir = "/lclscratch/sach/Programs/pflotran-dithionite-new"
+# basedir = "/lclscratch/sach/Programs/pflotran-dithionite-new"
 simbasename = "1d-allReactions-10m-uniformVelocity"
 templatename =  "1d-allReactions-10m-uniformVelocity"
 targetsbasename = "syntheticdata-nn-skip10"
@@ -28,11 +28,11 @@ outfile = open(joinpath(".","$(simbasename).mads"), "w")
 println(outfile,"Julia command: $(jcommand)")
 
 println(outfile,"Observations:")
-targetsf = open(joinpath(basedir,"dithionite_sensitivity","mads","setup","syntheticdata","$(targetsbasename)-targets.txt"), "r")
+targetsf = open(joinpath("syntheticdata","$(targetsbasename)-targets.txt"), "r")
 targets = readlines(targetsf)
 close(targetsf)
 for target in targets
-     write(outfile, target)
+     println(outfile, target)
 end
 
 println(outfile,"Parameters:")

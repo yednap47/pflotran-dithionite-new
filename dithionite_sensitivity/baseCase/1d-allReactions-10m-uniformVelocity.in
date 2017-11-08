@@ -74,7 +74,7 @@ CHEMISTRY
       RATE_CONSTANT 1.d-5 mol/m^2-sec
     /
   /
-  DATABASE /lclscratch/sach/Programs/pflotran-dithionite-new/database/chromium_dithionite.dat
+  DATABASE ../../database/chromium_dithionite.dat
   ACTIVITY_COEFFICIENTS TIMESTEP
   LOG_FORMULATION
   OUTPUT
@@ -168,7 +168,7 @@ OUTPUT
   PERIODIC TIME 1.d0 d
   PRINT_COLUMN_IDS
   MASS_BALANCE_FILE
-    PERIODIC TIME  1.d0 d
+    PERIODIC TIME 1.d0 d
   /
 END
 
