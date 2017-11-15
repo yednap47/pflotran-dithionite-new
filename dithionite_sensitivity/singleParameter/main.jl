@@ -7,7 +7,7 @@ function runforabit(command, timelimit, pollinterval=1)
     # note, all times are in seconds
     starttime = now()
     process = spawn(command)
-    while !process_exited(process) && float(now() - starttime) / 1000 < timelimit
+    while !process_exited(process) && convert(Float64,Dates.value(now() - starttime)) / 1000 < timelimit
         sleep(pollinterval)
     end
     if !process_exited(process)
@@ -160,7 +160,8 @@ for sensparam in sensparams
         cd(joinpath(basedir,rundir,sensparam,"run$i"))
         try
             println("starting $sensparam run $i")
-            runforabit(`mpirun -np $np $pfle -pflotranin $(simbasename).in > $(simbasename).txt`, maxruntime)
+            asdf = pipeline(`mpirun -np $(np) $(pfle) -pflotranin $(simbasename).in`, "$(simbasename).txt")
+            runforabit(asdf, maxruntime)
         catch
             warn("$(rundir)/$(sensparam)/run$(i) failed")
         end

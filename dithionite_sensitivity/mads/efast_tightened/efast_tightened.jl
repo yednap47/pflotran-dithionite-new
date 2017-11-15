@@ -30,7 +30,7 @@ Mads.plotobsSAresults(md, efastresult,
                       xtitle = "x", ytitle = "y")
 
 toc()
-# elapsed time: 220263.713274993 seconds
+# elapsed time: 72149.534347497 seconds
 JLD.save("efastresult.jld","dictionary",efastresult)
 
 # ================ PLOT RESULTS WITH PYPLOT ================================== #
