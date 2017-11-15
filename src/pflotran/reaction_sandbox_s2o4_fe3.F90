@@ -272,10 +272,10 @@ subroutine S2o4_fe3React(this,Residual,Jacobian,compute_derivative, &
   ! UNITS: g_fe(oh)3/g_sed from from m^3_mnrl/m^3_bulk
   FeIII = vf_feoh3/mv_feoh3/this%rock_density/1.d3*mw_feoh3
 
-  ! mole/l-s
+  ! mole/s
   rate = this%rate_constant*this%ssa* &
              rt_auxvar%pri_molal(this%id_spec_s2o4)* &
-             FeIII
+             FeIII*L_water
  
   if (rate < this%eps) then
     rate = 0.d0
@@ -294,11 +294,11 @@ subroutine S2o4_fe3React(this,Residual,Jacobian,compute_derivative, &
   ! NOTES
   ! 1. Always subtract contribution from residual
   ! 2. Units of residual are moles/second  
-  Residual(this%id_spec_s2o4) = Residual(this%id_spec_s2o4) - (-1.0*rate) * L_water
-  Residual(this%id_spec_h) = Residual(this%id_spec_h) - (-2.0*rate) * L_water
-  Residual(this%id_spec_so3) = Residual(this%id_spec_so3) - (2.0*rate) * L_water
-  Residual(id_bound_fe2_slow_offset) = Residual(id_bound_fe2_slow_offset) - (2.0*rate*L_water) * (1-this%sitefrac)
-  Residual(id_bound_fe2_fast_offset) = Residual(id_bound_fe2_fast_offset) - (2.0*rate*L_water) * this%sitefrac
+  Residual(this%id_spec_s2o4) = Residual(this%id_spec_s2o4) - (-1.0*rate)
+  Residual(this%id_spec_h) = Residual(this%id_spec_h) - (-2.0*rate)
+  Residual(this%id_spec_so3) = Residual(this%id_spec_so3) - (2.0*rate)
+  Residual(id_bound_fe2_slow_offset) = Residual(id_bound_fe2_slow_offset) - (2.0*rate*(1-this%sitefrac))
+  Residual(id_bound_fe2_fast_offset) = Residual(id_bound_fe2_fast_offset) - (2.0*rate*this%sitefrac)
 
   if (compute_derivative) then
 

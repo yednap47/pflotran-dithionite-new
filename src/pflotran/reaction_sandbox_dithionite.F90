@@ -240,7 +240,7 @@ subroutine DithioniteSetup(this,reaction,option)
   type(option_type) :: option
 
 ! 9. Add code to initialize
-  this%name_spec_h    = 'H+'
+  this%name_spec_h = 'H+'
   this%name_spec_o2 = 'O2(aq)'
   this%name_spec_cr6 = 'CrO4--'
   this%name_spec_cr3 = 'Cr+++'
@@ -396,40 +396,40 @@ subroutine DithioniteReact(this,Residual,Jacobian,compute_derivative, &
   ! 1. Always subtract contribution from residual
   ! 2. Units of residual are moles/second  
   Residual(this%id_spec_h) = Residual(this%id_spec_h) - &
-    (r_s2o4_disp +2.0*r_s2o4_o2 -(r_fe2_o2_fast+r_fe2_o2_slow) &
-    -2.66*(r_fe2_cr6_fast+r_fe2_cr6_slow) -2.0*r_s2o4_fe3)
+    (1.0*r_s2o4_disp +2.0*r_s2o4_o2 -1.0*r_fe2_o2_fast -1.0*r_fe2_o2_slow &
+    -2.66*r_fe2_cr6_fast -2.66*r_fe2_cr6_slow -2.0*r_s2o4_fe3)
 
   Residual(this%id_spec_o2) = Residual(this%id_spec_o2) - &
-    (-r_s2o4_o2 -0.25*(r_fe2_o2_fast+r_fe2_o2_slow))
+    (-1.0*r_s2o4_o2 -0.25*r_fe2_o2_fast -0.25*r_fe2_o2_slow)
 
   Residual(this%id_spec_cr6) = Residual(this%id_spec_cr6) - &
-    (-0.33*(r_fe2_cr6_fast+r_fe2_cr6_slow))
+    (-0.33*r_fe2_cr6_fast -0.33*r_fe2_cr6_slow)
 
   Residual(this%id_spec_cr3) = Residual(this%id_spec_cr3) - &
-    (0.33*(r_fe2_cr6_fast+r_fe2_cr6_slow))
+    (0.33*r_fe2_cr6_fast +0.33*r_fe2_cr6_slow)
 
   Residual(this%id_spec_s2o4) = Residual(this%id_spec_s2o4) - &
-    (-r_s2o4_disp -r_s2o4_o2 -r_s2o4_fe3)
+    (-1.0*r_s2o4_disp -1.0*r_s2o4_o2 -1.0*r_s2o4_fe3)
 
   Residual(this%id_spec_s2o3) = Residual(this%id_spec_s2o3) - &
     (0.5*r_s2o4_disp)
 
   Residual(this%id_spec_so3) = Residual(this%id_spec_so3) - &
-    (r_s2o4_disp +r_s2o4_o2 +2.0*r_s2o4_fe3)
+    (1.0*r_s2o4_disp +1.0*r_s2o4_o2 +2.0*r_s2o4_fe3)
 
   Residual(this%id_spec_so4) = Residual(this%id_spec_so4) - &
-    (r_s2o4_o2)
+    (1.0*r_s2o4_o2)
 
   Residual(this%id_spec_fe3) = Residual(this%id_spec_fe3) - & 
-    ((r_fe2_o2_fast+r_fe2_o2_slow) +(r_fe2_cr6_fast+r_fe2_cr6_slow))
+    (1.0*r_fe2_o2_fast +1.0*r_fe2_o2_slow +1.0*r_fe2_cr6_fast +1.0*r_fe2_cr6_slow)
 
 !  Residual(this%id_spec_fe2) = Residual(this%id_spec_fe2) - 0.0
 
   Residual(id_bound_fe2_fast_offset) = Residual(id_bound_fe2_fast_offset) - &
-    (-r_fe2_o2_fast -r_fe2_cr6_fast +2.0*r_s2o4_fe3*this%sitefrac)
+    (-1.0*r_fe2_o2_fast -1.0*r_fe2_cr6_fast +2.0*r_s2o4_fe3*this%sitefrac)
 
   Residual(id_bound_fe2_slow_offset) = Residual(id_bound_fe2_slow_offset) - &
-    (-r_fe2_o2_slow -r_fe2_cr6_slow +2.0*r_s2o4_fe3*(1-this%sitefrac))
+    (-1.0*r_fe2_o2_slow -1.0*r_fe2_cr6_slow +2.0*r_s2o4_fe3*(1-this%sitefrac))
 
   if (compute_derivative) then
 

@@ -231,22 +231,21 @@ subroutine S2o4_dispReact(this,Residual,Jacobian,compute_derivative, &
   PetscInt, parameter :: iphase = 1
   PetscReal :: L_water, rate
 
-  ! Unit of the residual must be in moles/second
-
   L_water = material_auxvar%porosity*global_auxvar%sat(iphase)* &
             material_auxvar%volume*1.d3 ! L_water from m^3_water
 
-  rate  = this%rate_constant*rt_auxvar%pri_molal(this%id_spec_s2o4)! mole/l-s
+  ! mole/s
+  rate  = this%rate_constant*rt_auxvar%pri_molal(this%id_spec_s2o4)*L_water
 
   if (rate < this%eps) then
     rate = 0.d0
   endif
 
   ! Residuals
-  Residual(this%id_spec_s2o4) = Residual(this%id_spec_s2o4) - (-1.0*rate) * L_water
-  Residual(this%id_spec_so3) = Residual(this%id_spec_so3) - (1.0*rate) * L_water
-  Residual(this%id_spec_s2o3) = Residual(this%id_spec_s2o3) - (0.5*rate) * L_water
-  Residual(this%id_spec_h) = Residual(this%id_spec_h) - (1.0*rate) * L_water
+  Residual(this%id_spec_s2o4) = Residual(this%id_spec_s2o4) - (-1.0*rate)
+  Residual(this%id_spec_so3) = Residual(this%id_spec_so3) - (1.0*rate)
+  Residual(this%id_spec_s2o3) = Residual(this%id_spec_s2o3) - (0.5*rate)
+  Residual(this%id_spec_h) = Residual(this%id_spec_h) - (1.0*rate)
 
   if (compute_derivative) then
 

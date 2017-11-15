@@ -258,9 +258,11 @@ subroutine Fe2_cr6React(this,Residual,Jacobian,compute_derivative, &
   FeII_slow = rt_auxvar%immobile(this%id_bound_fe2_slow)/(this%rock_density*1000)
   FeII_fast = rt_auxvar%immobile(this%id_bound_fe2_fast)/(this%rock_density*1000)
 
-  ! mole/l-s
-  rate_slow = this%rate_constant_slow*(FeII_slow)*rt_auxvar%pri_molal(this%id_spec_cr6)
-  rate_fast = this%rate_constant_fast*(FeII_fast)*rt_auxvar%pri_molal(this%id_spec_cr6)
+  ! mole/s
+  rate_slow = this%rate_constant_slow*FeII_slow* &
+    rt_auxvar%pri_molal(this%id_spec_cr6)*L_water
+  rate_fast = this%rate_constant_fast*FeII_fast* &
+    rt_auxvar%pri_molal(this%id_spec_cr6)*L_water
 
   if (rate_fast < this%eps) then
     rate_fast = 0.d0
@@ -280,12 +282,12 @@ subroutine Fe2_cr6React(this,Residual,Jacobian,compute_derivative, &
   ! NOTES
   ! 1. Always subtract contribution from residual
   ! 2. Units of residual are moles/second  
-  Residual(this%id_spec_cr6) = Residual(this%id_spec_cr6) - (-0.33*rate_slow-0.33*rate_fast) * L_water
-  Residual(this%id_spec_h) = Residual(this%id_spec_h) - (-2.66*rate_slow-2.66*rate_fast) * L_water
-  Residual(this%id_spec_cr3) = Residual(this%id_spec_cr3) - (0.33*rate_slow+0.33*rate_fast) * L_water
-  Residual(this%id_spec_fe3) = Residual(this%id_spec_fe3) - (1.0*rate_slow+1.0*rate_fast) * L_water
-  Residual(id_bound_fe2_slow_offset) = Residual(id_bound_fe2_slow_offset) - (-1.0*rate_slow) * L_water
-  Residual(id_bound_fe2_fast_offset) = Residual(id_bound_fe2_fast_offset) - (-1.0*rate_fast) * L_water
+  Residual(this%id_spec_cr6) = Residual(this%id_spec_cr6) - (-0.33*rate_slow-0.33*rate_fast)
+  Residual(this%id_spec_h) = Residual(this%id_spec_h) - (-2.66*rate_slow-2.66*rate_fast)
+  Residual(this%id_spec_cr3) = Residual(this%id_spec_cr3) - (0.33*rate_slow+0.33*rate_fast)
+  Residual(this%id_spec_fe3) = Residual(this%id_spec_fe3) - (1.0*rate_slow+1.0*rate_fast)
+  Residual(id_bound_fe2_slow_offset) = Residual(id_bound_fe2_slow_offset) - (-1.0*rate_slow)
+  Residual(id_bound_fe2_fast_offset) = Residual(id_bound_fe2_fast_offset) - (-1.0*rate_fast)
 
   if (compute_derivative) then
 

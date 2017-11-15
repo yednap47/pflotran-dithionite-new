@@ -4,8 +4,8 @@ plt = PyPlot
 using LaTeXStrings
 
 fig = plt.figure("pyplot",figsize=(15,7))
-filename = ARGS[1]
-# filename = "1d-allReactions-1m-uniformVelocity"
+# filename = ARGS[1]
+filename = "1d-allReactions-10m-uniformVelocity"
 
 myvar = [
 "pH",
