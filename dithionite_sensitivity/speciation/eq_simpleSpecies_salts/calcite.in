@@ -1,0 +1,211 @@
+# Id: calcite.in, Mon 17 Apr 2017 06:19:10 PM MDT pandeys #
+# Created by Sachin Pandey, LANL
+# Description: Equilibrate synthetic groundwater with calcite.
+#   - start with pH 7, see where it goes from there
+#------------------------------------------------------------------
+SIMULATION
+  SIMULATION_TYPE SUBSURFACE
+  PROCESS_MODELS
+    SUBSURFACE_FLOW flow
+      MODE RICHARDS
+    /
+    SUBSURFACE_TRANSPORT transport
+      GLOBAL_IMPLICIT
+    /
+  /
+END
+
+SUBSURFACE
+
+#=========================== chemistry ========================================
+CHEMISTRY
+  PRIMARY_SPECIES
+    H+
+    O2(aq)
+    CrO4--
+    S2O4--
+    S2O3--
+    SO3--
+    SO4--
+    Fe+++
+    Fe++
+    Cr+++
+    HCO3-
+    Ca++
+    Na+
+  /
+  SECONDARY_SPECIES
+    OH-
+    CO3--
+    CO2(aq)
+  /
+  IMMOBILE_SPECIES
+    slow_Fe++
+    fast_Fe++
+  /
+  MINERALS
+    Fe(OH)3(s)
+    Cr(OH)3(s)
+    Calcite
+  /
+  MINERAL_KINETICS
+    Fe(OH)3(s)
+      RATE_CONSTANT 1.d-3 mol/m^2-sec
+    /
+    Cr(OH)3(s)
+      RATE_CONSTANT 1.d-3 mol/m^2-sec
+    /
+    Calcite
+      RATE_CONSTANT 1.d-3 mol/m^2-sec
+    /
+  /
+  DATABASE ../../../database/chromium_dithionite.dat
+  ACTIVITY_COEFFICIENTS TIMESTEP
+  LOG_FORMULATION
+  OUTPUT
+    ALL
+    FREE_ION
+    TOTAL
+    SECONDARY_SPECIES
+    PH
+  /
+END
+
+#=========================== solver options ===================================
+LINEAR_SOLVER FLOW
+  SOLVER DIRECT
+END
+
+LINEAR_SOLVER TRANSPORT
+  SOLVER DIRECT
+END
+
+#=========================== discretization ===================================
+GRID
+  TYPE structured
+  ORIGIN 0.d0 0.d0 0.d0
+  NXYZ 1 1 1
+  BOUNDS
+    0.d0 0.d0 0.d0
+    1.d0 1.d0 1.d0
+  /
+END
+
+#=========================== fluid properties =================================
+FLUID_PROPERTY
+  DIFFUSION_COEFFICIENT 1.d-9
+END
+
+#=========================== material properties ==============================
+MATERIAL_PROPERTY saprolite
+  ID 1
+  POROSITY 3.28d-1
+  TORTUOSITY 1.d0
+  PERMEABILITY
+    PERM_ISO 1.d-12
+  /
+  CHARACTERISTIC_CURVES sf_saprolite
+END
+
+#=========================== saturation functions =============================
+! note: no need to specify phase as Richards is soley water phase
+CHARACTERISTIC_CURVES sf_saprolite
+  SATURATION_FUNCTION VAN_GENUCHTEN
+    M 8.5714d-01
+    ALPHA 7.6825e-05
+    LIQUID_RESIDUAL_SATURATION 1.5d-1
+  /
+  PERMEABILITY_FUNCTION MUALEM_VG_LIQ
+    M 8.5714d-01
+    LIQUID_RESIDUAL_SATURATION 1.5d-1
+  /
+END
+
+#=========================== output options ===================================
+OUTPUT
+  PERIODIC TIME 10.d0 d
+  PERIODIC_OBSERVATION TIME 1.d0 d
+  PRINT_COLUMN_IDS
+END
+
+#=========================== times ============================================
+TIME
+  FINAL_TIME 100.d0 d
+  INITIAL_TIMESTEP_SIZE 1.d-10 d
+  MAXIMUM_TIMESTEP_SIZE 1.d0 d
+END
+
+#=========================== regions ==========================================
+REGION all
+  COORDINATES
+    0.d0 0.d0 0.d0
+    1.d0 1.d0 1.d0
+  /
+END
+
+REGION obs
+  BLOCK 1 1 1 1 1 1
+END
+
+OBSERVATION obs
+  REGION obs
+END
+
+#=========================== flow conditions ==================================
+FLOW_CONDITION initial_pressure
+  TYPE
+    PRESSURE dirichlet  ! type is dirichlet for pressure
+  /                                       !   (constant pressure [Pa])
+    PRESSURE 1.0132e+05   ! saturated
+END
+
+#=========================== transport conditions =============================
+TRANSPORT_CONDITION initial
+  TYPE dirichlet
+  CONSTRAINT_LIST
+    0.d0 initial
+  /
+END
+
+#=========================== constraints ======================================
+CONSTRAINT initial
+  CONCENTRATIONS
+    H+      7.0 P
+    O2(aq)  2.84d-4 T
+    CrO4--  1.92d-5 T # 1000 ppb
+    S2O4--  1.d-20 T
+    S2O3--  1.d-20 T
+    SO3--   1.d-20 T
+    SO4--   1.d-20 T
+    Fe+++   1.d-20 T
+    Fe++    1.d-20 T
+    Cr+++   1.d-20 T
+    HCO3-   1.d-20 T
+    Ca++    1.d-20 T
+    Na+     1.d-20 T
+  /
+  MINERALS
+    Fe(OH)3(s) 0.00e+00 1.0e+03
+    Cr(OH)3(s) 0.00e+00 1.0e+03
+    Calcite 2.21e-02 1.0e+03
+  /
+  IMMOBILE
+    slow_Fe++ 1.0d-20
+    fast_Fe++ 1.0d-20
+  /
+END
+
+#=========================== condition couplers ===============================
+INITIAL_CONDITION
+  FLOW_CONDITION initial_pressure
+  TRANSPORT_CONDITION initial
+  REGION all
+END
+
+#=========================== condition couplers ===============================
+STRATA
+  REGION all
+  MATERIAL saprolite
+END
+
+END_SUBSURFACE
