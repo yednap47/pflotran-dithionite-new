@@ -31,7 +31,7 @@ Mads.plotobsSAresults(md, efastresult,
 
 toc()
 # elapsed time: 72149.534347497 seconds
-JLD.save("efastresult.jld","dictionary",efastresult)
+JLD.save("efast_tightened.jld","dictionary",efastresult)
 
 # ================ PLOT RESULTS WITH PYPLOT ================================== #
 coolnames  = JLD.load("../setup/coolnames.jld","dictionary")

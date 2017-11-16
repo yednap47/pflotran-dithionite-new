@@ -6,14 +6,13 @@ import DataFrames
 # Initialize
 #------------------------------------------------------------------------------
 # general info
-# basedir = "/lclscratch/sach/Programs/pflotran-dithionite-new"
-simbasename = "1d-allReactions-10m-uniformVelocity-tightened-efast"
+simbasename = "1d-allReactions-10m-uniformVelocity-efast"
 templatename =  "1d-allReactions-10m-uniformVelocity-efast"
 targetsbasename = "syntheticdata-nn-skip0"
 
 # Default parameters for writing MADS file
 paramfilename = "../../parameters.xlsx"
-sheetname = "mads_tightened"
+sheetname = "mads"
 jcommand = "read_data_efast.jl"
 soltype = "external"
 startover = "true"
