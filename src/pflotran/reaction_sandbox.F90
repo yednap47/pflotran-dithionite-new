@@ -8,6 +8,13 @@ module Reaction_Sandbox_module
   use Reaction_Sandbox_Cyber_class
 
   ! Add new reacton sandbox classes here.
+  use Reaction_Sandbox_S2o4_fe3_class
+  use Reaction_Sandbox_S2o4_o2_class
+  use Reaction_Sandbox_S2o4_disp_class
+  use Reaction_Sandbox_Fe2_o2_class
+  use Reaction_Sandbox_Fe2_cr6_class
+
+  ! Bulk sandboxes
   use Reaction_Sandbox_Dithionite_class
   use Reaction_Sandbox_Dithionite_v2_class
 
@@ -165,6 +172,18 @@ subroutine RSandboxRead2(local_sandbox_list,input,option)
         new_sandbox => SimpleCreate()
       case('CYBERNETIC')
         new_sandbox => CyberCreate()
+
+      case('S2O4_FE3')
+        new_sandbox => S2o4_fe3Create()
+      case('S2O4_O2')
+        new_sandbox => S2o4_o2Create()
+      case('S2O4_DISP')
+        new_sandbox => S2o4_dispCreate()
+      case('FE2_O2')
+        new_sandbox => Fe2_o2Create()
+      case('FE2_CR6')
+        new_sandbox => Fe2_cr6Create()
+
       case('DITHIONITE_PARAMETERS')
         new_sandbox => DithioniteCreate()
       case('DITHIONITE_V2_PARAMETERS')

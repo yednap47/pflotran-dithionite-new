@@ -59,7 +59,7 @@ function readdata(d)
         end
 
         # Check to make sure you have all of the observations
-        obskeys = Mads.getobskeys(md)
+        obskeys = Mads.getobskeys(d)
         if length(results) != length(obskeys)
             error("Number of simulated results does not match number of obskeys!!")
         end

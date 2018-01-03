@@ -1,4 +1,3 @@
-template !
 # Id: pflotran-reaction-simple.in, Wed 02 Nov 2016 09:41:54 AM MDT pandeys #
 # Created by Sachin Pandey, LANL
 # Description: Test simple reactions on 2D grid
@@ -18,7 +17,7 @@ END
 SUBSURFACE
 
 #=========================== useful tranport parameters ==================
-UNIFORM_VELOCITY !q! 0.d0 0.d0 m/d
+UNIFORM_VELOCITY 1.50e-01 0.d0 0.d0 m/d
 
 #=========================== chemistry ========================================
 CHEMISTRY
@@ -45,18 +44,32 @@ CHEMISTRY
     fast_Fe++
   /
   REACTION_SANDBOX
-    DITHIONITE_PARAMETERS
-      K_S2O4_DISP       !k_s2o4_disp!
-      K_S2O4_O2         !k_s2o4_o2!
-      K_S2O4_FE3        !k_s2o4_fe3!
-      K_FE2_O2_FAST     !k_fe2_o2_fast!
-      K_FE2_O2_SLOW     !k_fe2_o2_slow!
-      K_FE2_CR6_FAST    !k_fe2_cr6_fast!
-      K_FE2_CR6_SLOW    !k_fe2_cr6_slow!
-      ALPHA             !fraction!
-      ROCK_DENSITY      1200.d0   # kg/m^3_bulk
-      SSA_FEOH3         175.d0    # m^2/g
-      EPS               1.d-30
+    S2O4_DISP
+      RATE_CONSTANT 3.1622776601683795e-5 # log10 = -4.5
+      EPS 1.d-30
+    /
+    S2O4_O2
+      RATE_CONSTANT 1.00e+00 # /s
+      EPS 1.d-30
+    /
+    S2O4_FE3
+      RATE_CONSTANT 1.00e-05 # /s
+      SSA 175.d0 # m^2/g
+      ROCK_DENSITY 1200.d0 # m^3/m^3_bulk
+      FRACTION 5.00e-01
+      EPS 1.d-30
+    /
+    FE2_O2
+      RATE_CONSTANT_SLOW 1.00e-01 # /s
+      RATE_CONSTANT_FAST 1.00e+01 # /s
+      ROCK_DENSITY 1200.d0 # kg/m^3_bulk
+      EPS 1.d-30
+    /
+    FE2_CR6
+      RATE_CONSTANT_SLOW 1.00e-01 # /s
+      RATE_CONSTANT_FAST 1.00e+01 # /s
+      ROCK_DENSITY 1200.d0 # kg/m^3_bulk
+      EPS 1.d-30
     /
   /
   MINERALS
@@ -75,7 +88,7 @@ CHEMISTRY
       RATE_CONSTANT 1.d-5 mol/m^2-sec
     /
   /
-  DATABASE /lclscratch/sach/Programs/pflotran-dithionite-new/database/chromium_dithionite.dat
+  DATABASE ../../database/chromium_dithionite.dat
   ACTIVITY_COEFFICIENTS TIMESTEP
   LOG_FORMULATION
   OUTPUT
@@ -205,8 +218,6 @@ REGION east
   /
 END
 
-#=========================== flow conditions ==================================
-
 #=========================== transport conditions =============================
 TRANSPORT_CONDITION initial
   TYPE dirichlet
@@ -246,7 +257,7 @@ CONSTRAINT initial
     Ca++ 1.1723e-04 T
   /
   MINERALS
-    Fe(OH)3(s) !ifeoh3! 1.d3
+    Fe(OH)3(s) 3.86d-3 1.d3 # 1% mass percent
     Cr(OH)3(s) 1.d-20 1.d3
     Calcite 2.2099e-02 1.d3
   /
@@ -277,7 +288,7 @@ CONSTRAINT injectant
     H+     -0.4 T
     O2(aq)  2.84d-4 T
     CrO4--  1.d-20 T
-    S2O4--  !is2o4! T
+    S2O4--  0.1d0 T
     S2O3--  1.d-20 T
     SO3--   1.d-20 T
     SO4--   1.d-20 T

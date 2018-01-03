@@ -246,7 +246,7 @@ CONSTRAINT initial
     Ca++ 1.1723e-04 T
   /
   MINERALS
-    Fe(OH)3(s) !ifeoh3!  1.d3
+    Fe(OH)3(s) !ifeoh3! 1.d3
     Cr(OH)3(s) 1.d-20 1.d3
     Calcite 2.2099e-02 1.d3
   /

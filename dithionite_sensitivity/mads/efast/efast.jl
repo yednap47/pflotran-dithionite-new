@@ -10,7 +10,7 @@ reload("Mads")
 
 tic()
 # Load mads file, set weights
-@everywhere md = Mads.loadmadsfile("1d-allReactions-10m-uniformVelocity-tightened-efast.mads")
+@everywhere md = Mads.loadmadsfile("1d-allReactions-10m-uniformVelocity-efast.mads")
 
 # Mads.invobsweights!(md, 0.01)
 # 
@@ -30,8 +30,8 @@ Mads.plotobsSAresults(md, efastresult,
                       xtitle = "x", ytitle = "y")
 
 toc()
-# elapsed time: 72149.534347497 seconds
-JLD.save("efast_tightened.jld","dictionary",efastresult)
+# elapsed time: 68588.173365416 seconds
+JLD.save("efast.jld","dictionary",efastresult)
 
 # ================ PLOT RESULTS WITH PYPLOT ================================== #
 coolnames  = JLD.load("../setup/coolnames.jld","dictionary")
@@ -65,7 +65,7 @@ linewidth = 1.5
 f, ax = plt.subplots(4, 1, sharex=true, figsize=(8,10))
 
 # Spaghetti plots
-restartdir = "1d-allReactions-10m-uniformVelocity-tightened-efast_restart"
+restartdir = "1d-allReactions-10m-uniformVelocity-efast_restart"
 forwarddict = Dict()
 times = Mads.getobstime(md)
 fnames = readdir(restartdir)

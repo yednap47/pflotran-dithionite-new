@@ -230,13 +230,10 @@ subroutine S2o4_o2React(this,Residual,Jacobian,compute_derivative, &
   L_water = material_auxvar%porosity*global_auxvar%sat(iphase)* &
             material_auxvar%volume*1.d3 ! L_water from m^3_water
 
-  ! mole/l-s
-  ! rate = 0.0
-  ! if (rt_auxvar%total(this%id_spec_o2,iphase)>1e-20) then
-  !   rate = this%rate_constant*(rt_auxvar%pri_molal(this%id_spec_s2o4)+1.d-20)**1.5
-  ! endif
-
-  rate = this%rate_constant*(rt_auxvar%pri_molal(this%id_spec_s2o4))*rt_auxvar%pri_molal(this%id_spec_o2)
+  ! mole/s
+  rate = this%rate_constant* &
+    (rt_auxvar%pri_molal(this%id_spec_s2o4))* &
+    rt_auxvar%pri_molal(this%id_spec_o2)*L_water
 
   if (rate < this%eps) then
     rate = 0.d0
@@ -255,11 +252,11 @@ subroutine S2o4_o2React(this,Residual,Jacobian,compute_derivative, &
   ! NOTES
   ! 1. Always subtract contribution from residual
   ! 2. Units of residual are moles/second  
-  Residual(this%id_spec_s2o4) = Residual(this%id_spec_s2o4) - (-1.0*rate) * L_water
-  Residual(this%id_spec_o2) = Residual(this%id_spec_o2) - (-1.0*rate) * L_water
-  Residual(this%id_spec_so3) = Residual(this%id_spec_so3) - (1.0*rate) * L_water
-  Residual(this%id_spec_so4) = Residual(this%id_spec_so4) - (1.0*rate) * L_water
-  Residual(this%id_spec_h) = Residual(this%id_spec_h) - (2.0*rate) * L_water
+  Residual(this%id_spec_s2o4) = Residual(this%id_spec_s2o4) - (-1.0*rate)
+  Residual(this%id_spec_o2) = Residual(this%id_spec_o2) - (-1.0*rate)
+  Residual(this%id_spec_so3) = Residual(this%id_spec_so3) - (1.0*rate)
+  Residual(this%id_spec_so4) = Residual(this%id_spec_so4) - (1.0*rate)
+  Residual(this%id_spec_h) = Residual(this%id_spec_h) - (2.0*rate)
 
   if (compute_derivative) then
 

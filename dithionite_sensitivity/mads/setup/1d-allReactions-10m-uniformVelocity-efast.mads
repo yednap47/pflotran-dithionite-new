@@ -366,25 +366,25 @@ Observations:
 - Cr6_Obs_t364: {target: 2.54106e-05, weight: 100.0, time: 364.00}
 - Cr6_Obs_t365: {target: 2.54409e-05, weight: 100.0, time: 365.00}
 Parameters:
-- log_k_s2o4_disp: {init: -4.5000, min: -4.6000, max: -4.4000, type: opt}
+- log_k_s2o4_disp: {init: -4.5000, min: -5.5000, max: -3.5000, type: opt}
 - k_s2o4_disp: {exp: "10^log_k_s2o4_disp"}
-- log_k_s2o4_o2: {init: 0.0000, min: -0.1000, max: 0.1000, type: opt}
+- log_k_s2o4_o2: {init: 0.0000, min: -1.0000, max: 1.0000, type: opt}
 - k_s2o4_o2: {exp: "10^log_k_s2o4_o2"}
-- log_k_s2o4_fe3: {init: -5.0000, min: -5.1000, max: -4.9000, type: opt}
+- log_k_s2o4_fe3: {init: -5.0000, min: -6.0000, max: -4.0000, type: opt}
 - k_s2o4_fe3: {exp: "10^log_k_s2o4_fe3"}
-- log_fraction: {init: -0.3010, min: -0.4010, max: -0.2010, type: opt}
+- log_fraction: {init: -0.3010, min: -1.3010, max: 0.0000, type: opt}
 - fraction: {exp: "10^log_fraction"}
-- log_k_fe2_o2_fast: {init: 1.0000, min: 0.9000, max: 1.1000, type: opt}
+- log_k_fe2_o2_fast: {init: 1.0000, min: 0.0000, max: 2.0000, type: opt}
 - k_fe2_o2_fast: {exp: "10^log_k_fe2_o2_fast"}
-- log_factor_k_fe2_o2_slow: {init: -2.0000, min: -2.1000, max: -1.9000, type: opt}
-- log_k_fe2_cr6_fast: {init: 1.0000, min: 0.9000, max: 1.1000, type: opt}
+- log_factor_k_fe2_o2_slow: {init: -2.0000, min: -3.0000, max: -1.0000, type: opt}
+- log_k_fe2_cr6_fast: {init: 1.0000, min: 0.0000, max: 2.0000, type: opt}
 - k_fe2_cr6_fast: {exp: "10^log_k_fe2_cr6_fast"}
-- log_factor_k_fe2_cr6_slow: {init: -2.0000, min: -2.1000, max: -1.9000, type: opt}
-- log_is2o4: {init: -1.0000, min: -1.1000, max: -0.9000, type: opt}
+- log_factor_k_fe2_cr6_slow: {init: -2.0000, min: -3.0000, max: -1.0000, type: opt}
+- log_is2o4: {init: -1.0000, min: -2.0000, max: 0.0000, type: opt}
 - is2o4: {exp: "10^log_is2o4"}
-- log_ifeoh3: {init: -2.4136, min: -2.5136, max: -2.3136, type: opt}
+- log_ifeoh3: {init: -2.4136, min: -3.4136, max: -1.4136, type: opt}
 - ifeoh3: {exp: "10^log_ifeoh3"}
-- log_q: {init: -0.8239, min: -0.9239, max: -0.7239, type: opt}
+- log_q: {init: -0.8239, min: -1.8239, max: 0.1761, type: opt}
 - q: {exp: "10^log_q"}
 - k_fe2_o2_slow: {exp: "10^log_k_fe2_o2_fast*10^log_factor_k_fe2_o2_slow"}
 - k_fe2_cr6_slow: {exp: "10^log_k_fe2_cr6_fast*10^log_factor_k_fe2_cr6_slow"}
