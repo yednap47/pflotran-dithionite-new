@@ -1,6 +1,6 @@
 module Reaction_Sandbox_Dithionite_v2_class
 
-! # Id: reaction_sandbox_dithionite_v23, Tue 08 Mar 2016 04:43:33 PM MST pandeys #
+! # Id: reaction_sandbox_dithionite_v2, Tue 08 Mar 2016 04:43:33 PM MST pandeys #
 !       - update s2o4, so3, hcro4, hco3, h, cr(oh)3(s), fe(oh)3(s), siderite
 !       - full reactant inhibition, no product inhibition
 
@@ -38,17 +38,16 @@ module Reaction_Sandbox_Dithionite_v2_class
     character(len=MAXWORDLENGTH) :: name_spec_so3 ! SO3--
     character(len=MAXWORDLENGTH) :: name_spec_so4 ! SO4--
     character(len=MAXWORDLENGTH) :: name_spec_fe3 ! Fe+++
-!    character(len=MAXWORDLENGTH) :: name_spec_fe2 ! Fe++
+    character(len=MAXWORDLENGTH) :: name_spec_fe2 ! Fe++
     character(len=MAXWORDLENGTH) :: name_bound_fe2_fast ! bound_Fe++ FAST
     character(len=MAXWORDLENGTH) :: name_bound_fe2_slow ! bound_Fe++ SLOW
     character(len=MAXWORDLENGTH) :: name_mnrl_fe3 ! Fe(OH)3(s)
     PetscInt :: id_spec_h, id_spec_o2, id_spec_cr6, id_spec_cr3, id_spec_s2o4 
-!    PetscInt :: id_spec_s2o3, id_spec_so3, id_spec_so4, id_spec_fe3, id_spec_fe2
-    PetscInt :: id_spec_s2o3, id_spec_so3, id_spec_so4, id_spec_fe3
+    PetscInt :: id_spec_s2o3, id_spec_so3, id_spec_so4, id_spec_fe3, id_spec_fe2
     PetscInt :: id_mnrl_fe3, id_bound_fe2_fast, id_bound_fe2_slow
-    PetscReal :: k_s2o4_disp, k_s2o4_o2, k_s2o4_fe3
+    PetscReal :: k_s2o4_disp, k_s2o4_o2, k_s2o4_fe3, k_fe2aq_o2, k_fe2aq_cr6
     PetscReal :: k_fe2_o2_fast, k_fe2_o2_slow, k_fe2_cr6_fast, k_fe2_cr6_slow
-    PetscReal :: ssa_feoh3, rock_density, sitefrac, eps
+    PetscReal :: ssa_feoh3, rock_density, aqfrac, sitefrac, eps
   contains
     procedure, public :: ReadInput => Dithionite_v2Read
     procedure, public :: Setup => Dithionite_v2Setup
@@ -88,7 +87,7 @@ function Dithionite_v2Create()
   Dithionite_v2Create%name_spec_so3 = '' ! SO3--
   Dithionite_v2Create%name_spec_so4 = '' ! SO4--
   Dithionite_v2Create%name_spec_fe3 = '' ! Fe+++
-!  Dithionite_v2Create%name_spec_fe2 = '' ! Fe++
+  Dithionite_v2Create%name_spec_fe2 = '' ! Fe++
   Dithionite_v2Create%name_bound_fe2_slow = '' ! bound_Fe++ SLOW
   Dithionite_v2Create%name_bound_fe2_fast = '' ! bound_Fe++ FAST
   Dithionite_v2Create%name_mnrl_fe3 = '' ! Fe(OH)3(s)
@@ -103,7 +102,7 @@ function Dithionite_v2Create()
   Dithionite_v2Create%id_spec_so3 = 0 ! SO3--
   Dithionite_v2Create%id_spec_so4 = 0 ! SO4--
   Dithionite_v2Create%id_spec_fe3 = 0 ! Fe+++
-  !Dithionite_v2Create%id_spec_fe2 = 0 ! Fe++
+  Dithionite_v2Create%id_spec_fe2 = 0 ! Fe++
   Dithionite_v2Create%id_bound_fe2_slow = 0 ! bound_Fe++ SLOW
   Dithionite_v2Create%id_bound_fe2_fast = 0 ! bound_Fe++ FAST
   Dithionite_v2Create%id_mnrl_fe3 = 0 ! Fe(OH)3(s)
@@ -116,10 +115,14 @@ function Dithionite_v2Create()
   Dithionite_v2Create%k_fe2_o2_slow = 0.d0
   Dithionite_v2Create%k_fe2_cr6_fast = 0.d0
   Dithionite_v2Create%k_fe2_cr6_slow = 0.d0
+  Dithionite_v2Create%k_fe2aq_o2 = 0.d0
+  Dithionite_v2Create%k_fe2aq_cr6 = 0.d0
+
 
   ! Other constants
   Dithionite_v2Create%ssa_feoh3 = 0.d0
   Dithionite_v2Create%rock_density = 0.d0
+  Dithionite_v2Create%aqfrac = 0.d0
   Dithionite_v2Create%sitefrac = 0.d0
   Dithionite_v2Create%eps = 0.d0
 
@@ -176,6 +179,10 @@ subroutine Dithionite_v2Read(this,input,option)
         call InputReadDouble(input,option,this%k_s2o4_fe3)
         call InputErrorMsg(input,option,'K_S2O4_FE3', &
                            'CHEMISTRY,REACTION_SANDBOX,DITHIONITE_V2_PARAMETERS')
+      case('K_FE2AQ_O2')
+        call InputReadDouble(input,option,this%k_fe2aq_o2)
+        call InputErrorMsg(input,option,'K_FE2AQ_O2', &
+                           'CHEMISTRY,REACTION_SANDBOX,DITHIONITE_V2_PARAMETERS')
       case('K_FE2_O2_FAST')
         call InputReadDouble(input,option,this%k_fe2_o2_fast)
         call InputErrorMsg(input,option,'K_FE2_O2_FAST', &
@@ -183,6 +190,10 @@ subroutine Dithionite_v2Read(this,input,option)
       case('K_FE2_O2_SLOW')
         call InputReadDouble(input,option,this%k_fe2_o2_slow)
         call InputErrorMsg(input,option,'K_FE2_O2_SLOW', &
+                           'CHEMISTRY,REACTION_SANDBOX,DITHIONITE_V2_PARAMETERS')
+      case('K_FE2AQ_CR6')
+        call InputReadDouble(input,option,this%k_fe2aq_cr6)
+        call InputErrorMsg(input,option,'K_FE2AQ_CR6', &
                            'CHEMISTRY,REACTION_SANDBOX,DITHIONITE_V2_PARAMETERS')
       case('K_FE2_CR6_FAST')
         call InputReadDouble(input,option,this%k_fe2_cr6_fast)
@@ -201,8 +212,12 @@ subroutine Dithionite_v2Read(this,input,option)
         call InputErrorMsg(input,option,'ROCK_DENSITY', &
                            'CHEMISTRY,REACTION_SANDBOX,DITHIONITE_V2_PARAMETERS')
       case('ALPHA')
-        call InputReadDouble(input,option,this%sitefrac)
+        call InputReadDouble(input,option,this%aqfrac)
         call InputErrorMsg(input,option,'ALPHA', &
+                           'CHEMISTRY,REACTION_SANDBOX,DITHIONITE_V2_PARAMETERS')
+      case('BETA')
+        call InputReadDouble(input,option,this%sitefrac)
+        call InputErrorMsg(input,option,'BETA', &
                            'CHEMISTRY,REACTION_SANDBOX,DITHIONITE_V2_PARAMETERS')
       case('EPS')
         call InputReadDouble(input,option,this%eps)
@@ -249,7 +264,7 @@ subroutine Dithionite_v2Setup(this,reaction,option)
   this%name_spec_so3 = 'SO3--'
   this%name_spec_so4 = 'SO4--'
   this%name_spec_fe3 = 'Fe+++'
-!  this%name_spec_fe2 = 'Fe++'
+  this%name_spec_fe2 = 'Fe++'
   this%name_bound_fe2_fast  = 'fast_Fe++'
   this%name_bound_fe2_slow  = 'slow_Fe++'
   this%name_mnrl_fe3  = 'Fe(OH)3(s)'
@@ -273,8 +288,8 @@ subroutine Dithionite_v2Setup(this,reaction,option)
       GetPrimarySpeciesIDFromName(this%name_spec_so4,reaction,option)
   this%id_spec_fe3 = &
       GetPrimarySpeciesIDFromName(this%name_spec_fe3,reaction,option)
-!  this%id_spec_fe2 = &
-!      GetPrimarySpeciesIDFromName(this%name_spec_fe2,reaction,option)
+  this%id_spec_fe2 = &
+      GetPrimarySpeciesIDFromName(this%name_spec_fe2,reaction,option)
 
   ! Immobile species
   this%id_bound_fe2_fast = &
@@ -320,7 +335,7 @@ subroutine Dithionite_v2React(this,Residual,Jacobian,compute_derivative, &
   PetscInt, parameter :: iphase = 1
   PetscReal :: L_water, FeII_fast, FeII_slow, FeIII
   PetscReal :: vf_feoh3, mv_feoh3, mw_feoh3
-  PetscReal :: r_s2o4_disp, r_s2o4_o2, r_s2o4_fe3
+  PetscReal :: r_s2o4_disp, r_s2o4_o2, r_s2o4_fe3, r_fe2aq_o2, r_fe2aq_cr6
   PetscReal :: r_fe2_o2_fast, r_fe2_o2_slow, r_fe2_cr6_fast, r_fe2_cr6_slow
   PetscInt :: id_bound_fe2_slow_offset, id_bound_fe2_fast_offset
 
@@ -344,8 +359,10 @@ subroutine Dithionite_v2React(this,Residual,Jacobian,compute_derivative, &
   ! mole/s
   r_s2o4_disp = this%k_s2o4_disp * rt_auxvar%pri_molal(this%id_spec_s2o4) * L_water
   r_s2o4_o2 = this%k_s2o4_o2 * rt_auxvar%pri_molal(this%id_spec_s2o4) * rt_auxvar%pri_molal(this%id_spec_o2) * L_water
+  r_fe2aq_o2 = this%k_fe2aq_o2 * rt_auxvar%pri_molal(this%id_spec_fe2) * rt_auxvar%pri_molal(this%id_spec_o2) * L_water
   r_fe2_o2_fast = this%k_fe2_o2_fast * FeII_fast * rt_auxvar%pri_molal(this%id_spec_o2) * L_water
   r_fe2_o2_slow = this%k_fe2_o2_slow * FeII_slow * rt_auxvar%pri_molal(this%id_spec_o2) * L_water
+  r_fe2aq_cr6 = this%k_fe2aq_cr6 * rt_auxvar%pri_molal(this%id_spec_fe2) * rt_auxvar%pri_molal(this%id_spec_cr6) * L_water
   r_fe2_cr6_fast = this%k_fe2_cr6_fast * FeII_fast * rt_auxvar%pri_molal(this%id_spec_cr6) * L_water
   r_fe2_cr6_slow = this%k_fe2_cr6_slow * FeII_slow * rt_auxvar%pri_molal(this%id_spec_cr6) * L_water
   r_s2o4_fe3 = this%k_s2o4_fe3 * this%ssa_feoh3 * rt_auxvar%pri_molal(this%id_spec_s2o4) * FeIII * L_water
@@ -377,6 +394,14 @@ subroutine Dithionite_v2React(this,Residual,Jacobian,compute_derivative, &
   if (r_s2o4_fe3 < this%eps) then
     r_s2o4_fe3 = 0.d0
   endif
+  
+  if (r_fe2aq_o2 < this%eps) then
+    r_fe2aq_o2 = 0.d0
+  endif
+  
+  if (r_fe2aq_cr6 < this%eps) then
+    r_fe2aq_cr6 = 0.d0
+  endif
 
   ! for debug
 #if 0
@@ -397,16 +422,16 @@ subroutine Dithionite_v2React(this,Residual,Jacobian,compute_derivative, &
   ! 2. Units of residual are moles/second  
   Residual(this%id_spec_h) = Residual(this%id_spec_h) - &
     (r_s2o4_disp +2.0*r_s2o4_o2 -(r_fe2_o2_fast+r_fe2_o2_slow) &
-    -2.66*(r_fe2_cr6_fast+r_fe2_cr6_slow) -2.0*r_s2o4_fe3)
+    -2.66*(r_fe2_cr6_fast+r_fe2_cr6_slow) -2.0*r_s2o4_fe3 -4.0*r_fe2aq_o2 -8.0*r_fe2aq_cr6)
 
   Residual(this%id_spec_o2) = Residual(this%id_spec_o2) - &
-    (-r_s2o4_o2 -0.25*(r_fe2_o2_fast+r_fe2_o2_slow))
+    (-r_s2o4_o2 -0.25*(r_fe2_o2_fast+r_fe2_o2_slow)) - (-r_fe2aq_o2)
 
   Residual(this%id_spec_cr6) = Residual(this%id_spec_cr6) - &
-    (-0.33*(r_fe2_cr6_fast+r_fe2_cr6_slow))
+    (-0.33*(r_fe2_cr6_fast+r_fe2_cr6_slow) -r_fe2aq_cr6)
 
   Residual(this%id_spec_cr3) = Residual(this%id_spec_cr3) - &
-    (0.33*(r_fe2_cr6_fast+r_fe2_cr6_slow))
+    (0.33*(r_fe2_cr6_fast+r_fe2_cr6_slow) + r_fe2aq_cr6)
 
   Residual(this%id_spec_s2o4) = Residual(this%id_spec_s2o4) - &
     (-r_s2o4_disp -r_s2o4_o2 -r_s2o4_fe3)
@@ -421,15 +446,16 @@ subroutine Dithionite_v2React(this,Residual,Jacobian,compute_derivative, &
     (r_s2o4_o2)
 
   Residual(this%id_spec_fe3) = Residual(this%id_spec_fe3) - & 
-    ((r_fe2_o2_fast+r_fe2_o2_slow) +(r_fe2_cr6_fast+r_fe2_cr6_slow))
+    ((r_fe2_o2_fast+r_fe2_o2_slow) +(r_fe2_cr6_fast+r_fe2_cr6_slow) +4.0*r_fe2aq_o2 +3.0*r_fe2aq_cr6)
 
-!  Residual(this%id_spec_fe2) = Residual(this%id_spec_fe2) - 0.0
+  Residual(this%id_spec_fe2) = Residual(this%id_spec_fe2) - &
+    (2.0*r_s2o4_fe3*this%aqfrac -4.0*r_fe2aq_o2 -3.0*r_fe2aq_cr6)
 
   Residual(id_bound_fe2_fast_offset) = Residual(id_bound_fe2_fast_offset) - &
-    (-r_fe2_o2_fast -r_fe2_cr6_fast +2.0*r_s2o4_fe3*this%sitefrac)
+    (-r_fe2_o2_fast -r_fe2_cr6_fast +2.0*r_s2o4_fe3*(1-this%aqfrac)*this%sitefrac)
 
   Residual(id_bound_fe2_slow_offset) = Residual(id_bound_fe2_slow_offset) - &
-    (-r_fe2_o2_slow -r_fe2_cr6_slow +2.0*r_s2o4_fe3*(1-this%sitefrac))
+    (-r_fe2_o2_slow -r_fe2_cr6_slow +2.0*r_s2o4_fe3*(1-this%aqfrac)*(1-this%sitefrac))
 
   if (compute_derivative) then
 
