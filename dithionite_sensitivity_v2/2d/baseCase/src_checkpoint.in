@@ -1,0 +1,450 @@
+# Id: pflotran-test-flow.in, Mon 17 Oct 2016 09:52:36 AM MDT pandeys #
+# Created by Sachin Pandey, LANL
+# Description:
+#------------------------------------------------------------------------------
+#=========================== flow mode ========================================
+SIMULATION
+  SIMULATION_TYPE SUBSURFACE
+  PROCESS_MODELS
+    SUBSURFACE_FLOW flow
+      MODE RICHARDS
+    /
+    SUBSURFACE_TRANSPORT transport
+      GLOBAL_IMPLICIT
+      NUMERICAL_JACOBIAN
+    /
+  /
+  CHECKPOINT
+    PERIODIC TIMESTEP 1000
+  /
+END
+
+SUBSURFACE
+
+#=========================== chemistry ========================================
+CHEMISTRY
+  PRIMARY_SPECIES
+    H+
+    O2(aq)
+    CrO4--
+    S2O4--
+    S2O3--
+    SO3--
+    SO4--
+    Fe+++
+    Fe++
+    Cr+++
+    HCO3-
+    Ca++
+  /
+  SECONDARY_SPECIES
+    OH-
+    CO3--
+    CO2(aq)
+  /
+  IMMOBILE_SPECIES
+    slow_Fe++
+    fast_Fe++
+  /
+skip
+  REACTION_SANDBOX
+    DITHIONITE_V2_PARAMETERS
+      K_S2O4_DISP       3.1622776601683795d-5 # log10(k) = -4.5
+      K_S2O4_O2         1.d0
+      K_S2O4_FE3        1.d-5
+      K_FE2AQ_O2        1.d-3
+      K_FE2_O2_FAST     1.d1
+      K_FE2_O2_SLOW     1.d-1
+      K_FE2AQ_CR6       1.d-3
+      K_FE2_CR6_FAST    1.d1
+      K_FE2_CR6_SLOW    1.d-1
+      ROCK_DENSITY      1200.d0   # kg/m^3_bulk
+      SSA_FEOH3         175.d0    # m^2/g
+      ALPHA             2.d-1
+      BETA              5.d-1
+      EPS               1.d-30
+    /
+  /
+noskip
+  MINERALS
+    Fe(OH)3(s)
+    Cr(OH)3(s)
+    Calcite
+  /
+  MINERAL_KINETICS
+    Fe(OH)3(s)
+      RATE_CONSTANT 1.d-5 mol/m^2-sec
+    /
+    Cr(OH)3(s)
+      RATE_CONSTANT 1.d-5 mol/m^2-sec
+    /
+    Calcite
+      RATE_CONSTANT 1.d-5 mol/m^2-sec
+    /
+  /
+  DATABASE /lclscratch/sach/Programs/pflotran-dithionite-new/database/chromium_dithionite.dat
+  ACTIVITY_COEFFICIENTS TIMESTEP
+  LOG_FORMULATION
+  OUTPUT
+    ALL
+    FREE_ION
+    TOTAL
+    SECONDARY_SPECIES
+    PH
+  /
+END
+
+#=========================== solver options ===================================
+NEWTON_SOLVER TRANSPORT
+  ITOL_UPDATE 1.d-5
+  ITOL 1.d-12
+  RTOL 1.d-8
+  STOL 1.d-30
+END
+
+#=========================== discretization ===================================
+GRID
+  TYPE structured
+  NXYZ 100 75 1
+  BOUNDS
+    0.0 0.0 0.0
+    100.0 75.0 30.0
+  /
+END
+
+#============================== dataset =======================================
+#DATASET Permeability
+#  FILENAME ../fieldGeneration/multirealization/corr1_sig1/rand_100x75_corr10_sig1_20mpd_n6.h5
+#END
+
+#=========================== fluid properties =================================
+FLUID_PROPERTY
+  DIFFUSION_COEFFICIENT 1.d-9
+END
+
+#=========================== material properties ==============================
+MATERIAL_PROPERTY soil1
+  ID 1
+  POROSITY 0.15d0
+  TORTUOSITY 1.d0
+  SATURATION_FUNCTION cc1
+  ROCK_DENSITY 1200.d0 # kg/m^3_bulk
+  PERMEABILITY
+#     DATASET Permeability
+    PERM_ISO 2.3684342586299167e-11
+  /
+END
+
+#=========================== characteristic curves ============================
+CHARACTERISTIC_CURVES cc1
+  SATURATION_FUNCTION VAN_GENUCHTEN
+    ALPHA  1.d-4
+    M 0.5d0
+    LIQUID_RESIDUAL_SATURATION 0.1d0
+  /
+  PERMEABILITY_FUNCTION MUALEM_VG_LIQ
+    M 0.5d0
+    LIQUID_RESIDUAL_SATURATION 0.1d0
+  /
+END
+
+#=========================== output options ===================================
+OUTPUT
+  FORMAT HDF5
+  VELOCITY_AT_CENTER
+  VARIABLES
+    LIQUID_SATURATION
+    LIQUID_PRESSURE
+    LIQUID_HEAD 
+    PERMEABILITY
+  END
+  PERIODIC TIME 10.d0 d
+  PRINT_COLUMN_IDS
+END
+
+#=========================== times ============================================
+TIME
+  FINAL_TIME 1000.d0 d
+  INITIAL_TIMESTEP_SIZE 1.d-12 y 
+  MAXIMUM_TIMESTEP_SIZE 10.d0 d at 0.0 d
+END
+
+#=========================== regions ==========================================
+REGION all
+  COORDINATES
+     0.0 0.0 0.0
+     100.0 75.0 30.0
+  /
+END
+
+REGION west_lower
+  FACE WEST
+  COORDINATES
+     0.0 0.0 0.0
+     0.0 25.0 30.0
+  /
+END
+
+REGION west_source
+  FACE WEST
+  COORDINATES
+     0.0 25.0 0.0
+     0.0 50.0 30.0
+  /
+END
+
+REGION west_upper
+  FACE WEST
+  COORDINATES
+     0.0 50.0 0.0
+     0.0 75.0 30.0
+  /
+END
+
+
+REGION east
+  FACE EAST
+  COORDINATES
+     100.0 0.0 0.0
+     100.0 75.0 30.0
+  /
+END
+
+REGION source
+  COORDINATES
+    15.0 33.0 0.0
+    24.0 42.0 30.0
+  /
+END
+
+REGION inj1
+  COORDINATES
+    25.5 33.5 0.0
+    25.5 33.5 30.0
+  /
+END
+
+REGION inj2
+  COORDINATES
+    25.5 38.5 0.0
+    25.5 38.5 30.0
+  /
+END
+
+REGION inj3
+  COORDINATES
+    25.5 43.5 0.0
+    25.5 43.5 30.0
+  /
+END
+
+REGION obs1
+  COORDINATES
+    75.5 38.5 0.0
+    75.5 38.5 30.0
+  /
+END
+
+#=========================== observation points ==============================
+OBSERVATION obs1
+  REGION obs1
+/
+
+#=========================== flow conditions ==================================
+FLOW_CONDITION initial
+  TYPE
+    PRESSURE hydrostatic
+  /
+  DATUM 0.d0 0.d0 0.d0
+  PRESSURE 9.77879911e+06
+END
+
+FLOW_CONDITION no_flow
+  TYPE
+    FLUX neumann
+  /
+  FLUX 0.d0
+END
+
+FLOW_CONDITION west
+  TYPE
+    PRESSURE hydrostatic
+  /
+  DATUM 0.d0 0.d0 0.d0
+  PRESSURE 9.77879911e+06
+END
+
+FLOW_CONDITION east
+  TYPE
+    PRESSURE hydrostatic
+  /
+  DATUM 0.d0 0.d0 0.d0
+  PRESSURE 9.77146501e+06
+END
+
+FLOW_CONDITION injectant
+  TYPE
+    RATE mass_rate
+  /
+  RATE list
+    TIME_UNITS d
+    DATA_UNITS kg/s
+    0.d0 0.943665
+    2.d0 0.0
+  /
+END
+
+#=========================== transport conditions =============================
+TRANSPORT_CONDITION initial
+  TYPE dirichlet
+  CONSTRAINT_LIST
+    0.d0 initial
+  /
+END
+
+TRANSPORT_CONDITION inlet
+  TYPE dirichlet
+  CONSTRAINT_LIST
+    0.d0 inlet
+  /
+END
+
+TRANSPORT_CONDITION source
+  TYPE dirichlet
+  CONSTRAINT_LIST
+    0.d0 source
+  /
+END
+
+TRANSPORT_CONDITION outlet
+  TYPE dirichlet_zero_gradient
+  CONSTRAINT_LIST
+    0.d0 inlet
+  /
+END
+
+TRANSPORT_CONDITION injectant
+  TYPE dirichlet
+  CONSTRAINT_LIST
+    0.d0 injectant
+  /
+END
+
+#=========================== constraints ======================================
+CONSTRAINT initial
+  CONCENTRATIONS
+    H+ -1.1723e-04 T
+    O2(aq) 2.8400e-04 T
+    CrO4-- 1.9200e-20 T
+    S2O4-- 1.0000e-20 T
+    S2O3-- 1.0000e-20 T
+    SO3-- 1.0000e-20 T
+    SO4-- 1.0000e-20 T
+    Fe+++ 1.0000e-20 T
+    Fe++ 1.0000e-20 T
+    Cr+++ 1.0000e-20 T
+    HCO3- 1.1723e-04 T
+    Ca++ 1.1723e-04 T
+  /
+  MINERALS
+    Fe(OH)3(s) 3.86d-3 1.d3 # 1% mass percent
+    Cr(OH)3(s) 1.d-20 1.d3
+    Calcite 2.2099e-02 1.d3
+  /
+  IMMOBILE
+    slow_Fe++ 1.0d-20
+    fast_Fe++ 1.0d-20
+  /
+END
+
+CONSTRAINT inlet
+  CONCENTRATIONS
+    H+ -1.1723e-04 T
+    O2(aq) 2.8400e-04 T
+    CrO4-- 1.0000e-20 T
+    S2O4-- 1.0000e-20 T
+    S2O3-- 1.0000e-20 T
+    SO3-- 1.0000e-20 T
+    SO4-- 1.0000e-20 T
+    Fe+++ 1.0000e-20 T
+    Fe++ 1.0000e-20 T
+    Cr+++ 1.0000e-20 T
+    HCO3- 1.1723e-04 T
+    Ca++ 1.1723e-04 T
+
+  /
+END
+
+CONSTRAINT source
+  CONCENTRATIONS
+    H+ -1.1723e-04 T
+    O2(aq) 2.8400e-04 T
+    CrO4-- 1.9200e-05 T
+    S2O4-- 1.0000e-20 T
+    S2O3-- 1.0000e-20 T
+    SO3-- 1.0000e-20 T
+    SO4-- 1.0000e-20 T
+    Fe+++ 1.0000e-20 T
+    Fe++ 1.0000e-20 T
+    Cr+++ 1.0000e-20 T
+    HCO3- 1.1723e-04 T
+    Ca++ 1.1723e-04 T
+  /
+END
+
+CONSTRAINT injectant
+  CONCENTRATIONS
+    H+     -0.4 T
+    O2(aq)  2.84d-4 T
+    CrO4--  1.d-20 T
+    S2O4--  0.1d0 T
+    S2O3--  1.d-20 T
+    SO3--   1.d-20 T
+    SO4--   1.d-20 T
+    Fe+++   1.d-20 T
+    Fe++    1.0000e-20 T
+    Cr+++   1.d-20 T
+    HCO3-   0.4d0 T
+    Ca++    1.d-20 T
+  /
+END
+
+#=========================== condition couplers ===============================
+# initial condition
+INITIAL_CONDITION
+  TRANSPORT_CONDITION initial
+  FLOW_CONDITION initial
+  REGION all
+END
+
+BOUNDARY_CONDITION west_lower
+  TRANSPORT_CONDITION inlet
+  FLOW_CONDITION west
+  REGION west_lower
+END
+
+BOUNDARY_CONDITION west_source
+  TRANSPORT_CONDITION source
+  FLOW_CONDITION west
+  REGION west_source
+END
+
+BOUNDARY_CONDITION west_upper
+  TRANSPORT_CONDITION inlet
+  FLOW_CONDITION west
+  REGION west_upper
+END
+
+BOUNDARY_CONDITION east  
+  TRANSPORT_CONDITION outlet
+  FLOW_CONDITION east 
+  REGION east
+END
+
+#=========================== stratigraphy couplers ============================
+STRATA
+  REGION all 
+  MATERIAL soil1
+END
+
+END_SUBSURFACE
