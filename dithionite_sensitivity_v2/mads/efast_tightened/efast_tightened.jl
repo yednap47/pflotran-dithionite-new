@@ -104,7 +104,8 @@ restartdir = "1d-allReactions-10m-uniformVelocity-tightened-efast_restart"
 forwarddict = Dict()
 times = Mads.getobstime(md)
 fnames = readdir(restartdir)
-fnames = fnames[test.==false]
+temp = [contains("g_lm",i) for i in fnames]
+fnames = fnames[temp.==false]
 for i in 1:length(fnames)
     forwarddict["run$(i)"] = JLD.load(joinpath(restartdir,fnames[i]))
 end
