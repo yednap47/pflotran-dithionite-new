@@ -13,14 +13,15 @@ tic()
 @everywhere md = Mads.loadmadsfile("1d-allReactions-10m-uniformVelocity-tightened-efast.mads")
 
 info("Global sensitivity analysis")
-efastresult = Mads.efast(md, N=1, seed=2016)
+efastresult = Mads.efast(md, N=5000, seed=2016)
 Mads.plotobsSAresults(md, efastresult, 
                       filename="sensitivity_global.png", 
                       xtitle = "x", ytitle = "y")
 
 toc()
-# elapsed time: 220263.713274993 seconds
-# n = 5,389 samples
+# elapsed time: 821015.769958511 seconds
+# n = 70,588 samples
+
 JLD.save("efastresult.jld","dictionary",efastresult)
 
 # ================ PLOT RESULTS WITH PYPLOT ================================== #
